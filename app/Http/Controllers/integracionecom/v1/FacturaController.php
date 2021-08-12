@@ -80,7 +80,7 @@ class FacturaController extends Controller
             $cadena .= str_pad($factura['nit'], 15, " ", STR_PAD_RIGHT); //Tercero cliente a facturar
             $cadena .= '520'; //Clase interna del documento
             $cadena .= '1'; //Estado del documento
-            $cadena .= '1'; //Estado de impresión del documento
+            $cadena .= '0'; //Estado de impresión del documento
             $cadena .= $factura['sucursal_cliente']; //Sucursal cliente a facturar
             $cadena .= '0001'; //Tipo de cliente
             $cadena .= $factura['centro_operacion']; //Centro de operacion de la factura
@@ -124,7 +124,7 @@ class FacturaController extends Controller
             $cadena .= '000000000000000.0000'; //Volumen
             $cadena .= '000000000000000.0000'; //Valor asegurado
             $cadena .= str_pad('', 255, " ", STR_PAD_RIGHT); //Notas
-            $cadena .= str_pad('2', 3, "0", STR_PAD_LEFT); //Caja de recaudo
+            $cadena .= str_pad('', 3, " ", STR_PAD_LEFT); //Caja de recaudo
             $cadena .= '0'; //Genera Kit
             $cadena .= str_pad('', 3, " ", STR_PAD_RIGHT); //Tipo de documento de proceso
             $cadena .= str_pad('', 5, " ", STR_PAD_RIGHT); //Bodega de componentes del kit
@@ -133,37 +133,27 @@ class FacturaController extends Controller
             $cadena .= '070'; //Clase de documento proceso
             $cadena .= "\n";
             
-            //-------- Caja
+            //-------- cxc
 
             $cadena .= str_pad(3, 7, "0", STR_PAD_LEFT); //Numero de registro
-            $cadena .= str_pad(358, 4, "0", STR_PAD_LEFT); //Tipo de registro
-            $cadena .= '00'; //Subtipo de registro
+            $cadena .= str_pad(353, 4, "0", STR_PAD_LEFT); //Tipo de registro
+            $cadena .= '03'; //Subtipo de registro
             $cadena .= '01'; //version del tipo de registro
             $cadena .= '001'; //Compañia
             $cadena .= '001'; //Centro de operación del documento
             $cadena .= $factura['tipo_documento']; //Tipo de documento
             $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero documento
-            $cadena .= $factura['medio_pago'];//Medio de pago
-            $cadena .= str_pad(intval($factura['valor_medio_pago']), 15, "0", STR_PAD_LEFT) . '.0000';//Valor de medio de pago
-            $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT);//Codigo de banco
-            $cadena .= '00000000';// Numero de cheque
-            $cadena .= str_pad('', 25, " ", STR_PAD_RIGHT);//Numero de cuenta / tarjeta
-            $cadena .= str_pad('', 3, " ", STR_PAD_RIGHT);//Código de seguridad
-            $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT);//Numero de autorizacion
-            $cadena .= str_pad('', 8, " ", STR_PAD_RIGHT);//Fecha o año/mes de vencimiento
-            if($factura['medio_pago']=='CG1'){
-                $cadena .= str_pad($factura['referencia_medio_pago'], 30, " ", STR_PAD_RIGHT);//Referencia
-                $cadena .= str_pad($factura['fecha_consignacion_cheque'], 8, " ", STR_PAD_RIGHT);//Fecha de consignación del cheque devuelto
-            }else{
-                $cadena .= str_pad('', 30, " ", STR_PAD_RIGHT);//Referencia
-                $cadena .= str_pad('', 8, " ", STR_PAD_RIGHT);//Fecha de consignación del cheque devuelto
-            }
-            $cadena .= str_pad('', 3, " ", STR_PAD_RIGHT);//Causal de devolución
-            $cadena .= str_pad('', 15, " ", STR_PAD_RIGHT);//Código del tercero al que le devolvieron el cheque
-            $cadena .= str_pad('', 255, " ", STR_PAD_RIGHT);//Observaciones del movimiento
-            $cadena .= str_pad('', 15, " ", STR_PAD_RIGHT);//Auxiliar de centro de costos
+            $cadena .= str_pad('',3," ",STR_PAD_LEFT); //Tipo documento de cruce
+            $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero de documento de cruce
+            $cadena .= '000'; //Numero de cuota
+            $cadena .= '000000000000000.0000'; // Valor cuota o valor a cruzar
+            $cadena .= '100.00'; //Porcentaje de la cuota respecto al  total del documento.
+            $cadena .= $factura['fecha_factura']; //Fecha de vencimiento de la cuota -- OJO SUMAR 3 DIAS MAS PARA FECHA VENCIMIENTO
+            $cadena .= '000000000000000.0000'; //Valor descuento pronto pago
+            $cadena .= '000.00'; //Porcentaje del pronto pago con respecto a la cuota
+            $cadena .= $factura['fecha_factura']; //Fecha de pronto pago de la cuota
             $cadena .= "\n";
-
+            
             //-------Relacion documentos
 
             $cadena .= str_pad(4, 7, "0", STR_PAD_LEFT); //Numero de registro
@@ -214,7 +204,7 @@ class FacturaController extends Controller
                 $cadena .= '01'; //Unidad de negocio movimiento
                 $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Centro de costo movimiento
                 $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Proyecto
-                $cadena .= $listaPrecio; //Lista de precio
+                $cadena .= str_pad($listaPrecio, 3, " ",STR_PAD_RIGHT) ; //Lista de precio
                 $cadena .= 'UNID'; //Unidad de medida precio
                 $cadena .= 'UNID'; //Unidad de medida del movimiento
                 $cadena .= str_pad(intval($detalleFactura['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
@@ -246,7 +236,7 @@ class FacturaController extends Controller
             
             $respImport=$this->importarXml($xmlFactura);
             
-            if($respImport['created']===false){
+            if($respImport['created']===false){ 
                 return response()->json([
                     'created' => false,
                     'code' => 412,
