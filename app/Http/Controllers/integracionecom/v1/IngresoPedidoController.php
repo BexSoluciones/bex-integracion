@@ -41,7 +41,7 @@ class IngresoPedidoController extends Controller
 
         $respValidacion = $this->validarEstructuraJson($request);
 
-        
+
         if ($respValidacion['valid'] == false) {
 
             return response()->json([
@@ -218,6 +218,8 @@ class IngresoPedidoController extends Controller
             if ($respValidarEncabezado['valid'] == false) {
 
                 $erroresEncabezado[$contEE] = $respValidarEncabezado['errors'];
+                $erroresTotal ['registro_'.($key+1)]['tipo_documento'] = $data['tipo_documento'];
+                $erroresTotal ['registro_'.($key+1)]['numero_pedido'] = $data['numero_pedido'];
                 $erroresTotal['registro_'.($key+1)]['error_encabezado_pedido'] = $erroresEncabezado;
                 $contEE++;
             }
@@ -243,6 +245,8 @@ class IngresoPedidoController extends Controller
                     $item++;
                 }
                 if(count($erroresDetallePedido)>0){
+                    $erroresTotal ['registro_'.($key+1)]['tipo_documento'] = $data['tipo_documento'];
+                    $erroresTotal ['registro_'.($key+1)]['numero_pedido'] = $data['numero_pedido'];
                     $erroresTotal['registro_'.($key+1)]['error_detalle_pedido'] = $erroresDetallePedido;
                     $contED++;
                 }
@@ -288,7 +292,7 @@ class IngresoPedidoController extends Controller
         ];
 
         $validator = Validator::make($datosEncPedido, $rules);
-
+        
         if ($validator->fails()) {
             return [
                 'valid' => false,
@@ -312,9 +316,8 @@ class IngresoPedidoController extends Controller
             'cantidad' => 'required|digits_between:1,15',
             'precio_unitario' => 'required|regex:/^[0-9]+(\.[0-9]{1,4})?$/',
         ];
-
         $validator = Validator::make($datosDetallePedido, $rules);
-
+        
         if ($validator->fails()) {
             return [
                 'valid' => false,

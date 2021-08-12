@@ -22,7 +22,7 @@ class BodegasTiposDocModel extends Model
     public function validarTipoDocumento($tipoDoc,$bodega){
 
         $datos=$this->where('bodega_siesa','=',$bodega)->where('tipo_documento_siesa','=',$tipoDoc)->get();
-
+        
         if(count($datos)>0){
             return true;
         }else{
@@ -33,8 +33,9 @@ class BodegasTiposDocModel extends Model
 
     public function validarTipoDocumentoFactura($tipoDocFactura,$bodega){
 
-        $datos=$this->where('bodega_siesa','=',$bodega)->where('tipo_documento_factura','=',$tipoDocFactura)->get();
-
+        $datos=$this->where('bodega_siesa','=',$bodega)
+                    ->where('tipo_documento_factura','=',$tipoDocFactura)
+                    ->get();
         if(count($datos)>0){
             return true;
         }else{
