@@ -89,6 +89,7 @@ class PedidoCore
             foreach ($detallesPedido as $key => $detallePedido) {
                 //---Declarando variables
                 $listaPrecio = $detallePedido['lista_precio'];
+                log::info($detallePedido);
                 $productoSiesa = $this->obtenerCodigoProductoSiesa($detallePedido['codigo_producto']);
                 
                 if (!empty($productoSiesa)) {
