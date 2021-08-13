@@ -85,21 +85,13 @@ class PedidoCore
             //Creacion Detalle - movimientos pedido
             $contador = 3;
             $contadorDetallePedido = 1;
-
+            
             foreach ($detallesPedido as $key => $detallePedido) {
                 //---Declarando variables
                 $listaPrecio = $detallePedido['lista_precio'];
-                if (is_float($detallePedido['precio_unitario'])) {
-                    $precio = explode(".", $detallePedido['precio_unitario']);
-                    log::info($precio);
-                    die;
-                    $precioProducto = $detallePedido['precio_unitario'];
-                    str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
-                }else {
-                    $precioProducto = str_pad($detallePedido['precio_unitario'], 15, "0", STR_PAD_LEFT) . '.0000';
-                }
-
-                log::info($detallePedido);
+                $precioEnt = substr($detallePedido['precio_unitario'], 0, -3);
+                $precioDec= substr($detallePedido['precio_unitario'], -3);
+  
                 $productoSiesa = $this->obtenerCodigoProductoSiesa($detallePedido['codigo_producto']);
                 
                 if (!empty($productoSiesa)) {
@@ -137,7 +129,7 @@ class PedidoCore
                     $cadena .= 'UNID'; //Unidad de medida-->pendiente
                     $cadena .= str_pad(intval($detallePedido['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
                     $cadena .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
-                    $cadena .= str_pad($precioProducto, 15, "0", STR_PAD_LEFT) . '.0000'; //Precio unitario
+                    $cadena .= str_pad($precioEnt, 15, "0", STR_PAD_LEFT) . str_pad($precioDec, 5, "0", STR_PAD_RIGHT);; //Precio unitario
                     $cadena .= '0'; //Impuestos asumidos
                     $cadena .= str_pad('', 255, " ", STR_PAD_LEFT); //Notas
                     $cadena .= str_pad('', 2000, " ", STR_PAD_LEFT); //Descripcion
