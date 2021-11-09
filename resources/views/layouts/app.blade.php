@@ -58,6 +58,7 @@
                             @endif --}}
                         @else
                             <li class="nav-item">
+                                <a class="nav-link" href="{{ route('reenviofacturas') }}">Reenviar facturas</a>
                                 <a class="nav-link" href="{{ route('reenviopedido') }}">Reenviar pedidos</a>
                             </li>
                             <li class="nav-item dropdown">
