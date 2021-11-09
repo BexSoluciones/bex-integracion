@@ -91,7 +91,7 @@ class PedidoCore
                 $listaPrecio = $detallePedido['lista_precio'];
                 $precioEnt = substr($detallePedido['precio_unitario'], 0, -3);
                 $precioDec= substr($detallePedido['precio_unitario'], -3);
-  
+                $precioEnt = $precioEnt > '0' ? $precioEnt : '1';
                 $productoSiesa = $this->obtenerCodigoProductoSiesa($detallePedido['codigo_producto']);
                 
                 if (!empty($productoSiesa)) {
