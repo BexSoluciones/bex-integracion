@@ -1,11 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\integracionecom\v1;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Models\DetalleFacturaModel;
+use App\Models\EncabezadoFacturaModel;
 use App\Traits\TraitHerramientas;
-use App\Models\EncabezadoPedidoModel;
-use App\Models\DetallePedidoModel;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Log;
 use Validator;
 
@@ -51,8 +53,8 @@ class IngresoFacturaController extends Controller
                 'code' => 412,
                 'errors' => $respValidacion['errors'],
             ], 412);
-
         }
+        
         $facturasResp=[];
         $facturasRecib = $request->input('data');
         foreach ($facturasRecib as $key => $value) {
@@ -73,19 +75,17 @@ class IngresoFacturaController extends Controller
             ], 201);
 
         } catch (\Exception $e) {
-            Log::error("Error al guardar pedidos. Detalle error: {$e->getCode()},revisar linea: {$e->getLine()},{$e->getMessage()}");
+            Log::error("Error al guardar la factura. Detalle error: {$e->getCode()},revisar linea: {$e->getLine()},{$e->getMessage()}");
             return response()->json([
                 'created' => false,
                 'code' => 500,
                 'errors' =>"Error de servidor por favor contactarse con el administrador",
             ], 500);
         }
-
     }
     
     public function validarEstructuraJson($request)
     {
-
         //--------Valido que exista data
         $formatoValido = false;
         $formatoValido = $request->input('data') ?? false;
@@ -100,21 +100,19 @@ class IngresoFacturaController extends Controller
         //--------Defino data
         $this->data = $request->input('data');
 
-        //--------Valido que exista detalle pedido
+        //--------Valido que exista detalle factura
         $erroresTotal = [];
         $erroresEncabezado = [];
         $contEE = 0;
         $erroresDetalleNoDefinido = [];
         $contED = 0;
         foreach ($this->data as $key => $data) {
-            
             $datosEnc = $data;
             unset($datosEnc['detalle_factura']);
             $datosEnc = $this->depurarCamposAutorizados(self::CAMPOS_AUTORIZADOS_ENCABEZADO, $datosEnc);
 
             $respValidarEncabezado = $this->validarEncabezadoFactura($datosEnc);
             if ($respValidarEncabezado['valid'] == false) {
-
                 $erroresEncabezado[$contEE] = $respValidarEncabezado['errors'];
                 $erroresTotal ['registro_'.($key+1)]['tipo_documento'] = $data['tipo_documento'];
                 $erroresTotal ['registro_'.($key+1)]['numero_factura'] = $data['numero_factura'];
@@ -129,19 +127,17 @@ class IngresoFacturaController extends Controller
                 $erroresTotal['registro_'.($key+1)]['error_detalle_factura'] = "Formato json no válido, detalle factura " . $data['numero_factura'] . " no está definido";
                 $contED++;
             } elseif($formatoValido) {
-                
                 $item = 1;
                 $erroresDetalleFactura = [];
                 foreach ($data['detalle_factura'] as $keyb => $detalleFactura) {
-                    
                     $detalleFactura=$this->depurarCamposAutorizados(self::CAMPOS_AUTORIZADOS_DETALLE, $detalleFactura);
                     $respValidacion = $this->validarDetalleFactura($detalleFactura);
                     if ($respValidacion['valid'] == false) {
-                        $erroresdetalleFactura['item_' . $item] = $respValidacion['errors'];
+                        $erroresDetalleFactura['item_' . $item] = $respValidacion['errors'];
                     }
-
                     $item++;
                 }
+                
                 if(count($erroresDetalleFactura)>0){
                     $erroresTotal ['registro_'.($key+1)]['tipo_documento'] = $data['tipo_documento'];
                     $erroresTotal ['registro_'.($key+1)]['numero_factura'] = $data['numero_factura'];
@@ -149,7 +145,6 @@ class IngresoFacturaController extends Controller
                     $contED++;
                 }
             }
-
         }
 
         if (count($erroresTotal) > 0) {
@@ -168,9 +163,7 @@ class IngresoFacturaController extends Controller
     public function validarEncabezadoFactura($datosEncFactura)
     {
         //------Elimino detalle factura el cual no esta dentro de esta validación
-
         $datosEncFactura = $this->decodificarArray($datosEncFactura);
-
         $rules = [
             'tipo_documento' => 'required',
             'numero_factura' => 'required',
@@ -189,7 +182,6 @@ class IngresoFacturaController extends Controller
             'bodega' => 'required|digits_between:1,5',
             'centro_operacion' => 'required|digits_between:1,3',
             'observaciones_factura' => 'max:2000',
-            
         ];
         
         if($datosEncFactura['medio_pago'] =='CG1'){
@@ -210,20 +202,17 @@ class IngresoFacturaController extends Controller
                 'errors' => 0,
             ];
         }
-
     }
 
     public function validarDetalleFactura($datosDetalleFactura)
     {
-
-        $rules = [
-            'codigo_producto' => 'required',
+        $validator = $datosDetalleFactura->validator([
+            'codigo_producto' => 'required|min:4|max:15|different:NULL',
             'lista_precio' => 'required|max:3',
             'cantidad' => 'required|digits_between:1,15',
             'valor_bruto' => 'required|regex:/^[0-9]+(\.[0-9]{1,4})?$/',
-        ];
-        $validator = Validator::make($datosDetalleFactura, $rules);
-        
+        ]);
+
         if ($validator->fails()) {
             return [
                 'valid' => false,
@@ -235,12 +224,10 @@ class IngresoFacturaController extends Controller
                 'errors' => 0,
             ];
         }
-
     }
 
     public function depurarCamposAutorizados($camposAutorizados, $data)
     {
-
         $nuevoArray = [];
         foreach ($data as $campo => $valor) {
 
@@ -249,7 +236,6 @@ class IngresoFacturaController extends Controller
                 if ($value['campo'] === $campo) {
                     $nuevoArray[$campo] = $valor;
                 }
-
             }
 
         }
@@ -271,19 +257,14 @@ class IngresoFacturaController extends Controller
                     $nuevoArray[$campo] = $valor;
                 }
             }
-            
             $encabezadosFacturas[$contadorFactura] = $nuevoArray;
             $contadorFactura++;
-
         }
-        
         EncabezadoFacturaModel::insertOrIgnore($encabezadosFacturas);
-
     }
 
     public function guardarDetalleFactura($request)
     {
-
         $facturas = $request->input('data');
         $contadorItem = 0;
         $facturaItem = [];
@@ -306,5 +287,4 @@ class IngresoFacturaController extends Controller
         }
         DetalleFacturaModel::insertOrIgnore($facturaItem);
     }
-
 }
