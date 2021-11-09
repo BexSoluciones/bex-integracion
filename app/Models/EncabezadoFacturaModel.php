@@ -17,17 +17,17 @@ class EncabezadoFacturaModel extends Model
         'centro_operacion',
         'CODTIPODOC',
         'tipo_documento',
-        'numero_pedido',
+        'numero_factura',
         'cedula_vendedor',
         'NUMVISITA' ,
-        'nit_cliente',
+        'nit',
         'CODPRECIO',
         'CODDESCUENTO',
         'CODMOTVIS',
         'FECHORINIVISITA',
         'FECHORFINVISITA',
         'EXTRARUTAVISITA',
-        'fecha_pedido',
+        'fecha_factura',
         'CODVEHICULO',
         'MOTENTREGA',
         'FECHORENTREGAMOV',
@@ -41,7 +41,7 @@ class EncabezadoFacturaModel extends Model
         'NUMLIQUIDACION',
         'FECHORLIQUIDACION',
         'ORDENCARGUEMOV',
-        'observaciones_pedido',
+        'observaciones_factura',
         'JAVAID',
         'FECCAP',
         'NUMMOVALT',
@@ -75,7 +75,14 @@ class EncabezadoFacturaModel extends Model
         'tipo_cliente',
         'bodega',
         'sucursal_cliente',
-        'vendedor',        
+        'nombre_vendedor',
+        'medio_pago',
+        'valor_medio_pago',
+        'referencia_medio_pago',
+        'fecha_consignacion_cheque',
+        'tipo_documento_remision',
+        'numero_documento_remision',
+        'fecha_venc',
     ];
     public $timestamps=false;
     //eloquent
@@ -92,9 +99,9 @@ class EncabezadoFacturaModel extends Model
 
     //DB
     public function obtenerFacturaEncabezado($estado){
-        $sql="select * from ".$this->table." where estadoenviows='".$estado."'";          
+        $sql="select *, DATE_ADD(fecha_factura, INTERVAL 3 DAY) AS fecha_venc from ".$this->table." where estadoenviows='".$estado."'";          
         $resultadoSql = DB::select($sql);
-        //log::info($resultadoSql);     
+        // log::info($resultadoSql);     
         return json_decode(json_encode($resultadoSql),true);
     }
 }

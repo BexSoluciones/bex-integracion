@@ -11,6 +11,7 @@ class LogErrorImportacionModel extends Model
     protected $connection = 'mysql';
 
     protected $table="tbldmovenc";
+    protected $tableFact ="tbldmovencfac";
 
     public function actualizarEstadoDocumento($mensaje, $estado, $centroOperacion, $bodega, $tipoDocumento, $numeroPedido){
         
@@ -25,6 +26,21 @@ class LogErrorImportacionModel extends Model
         AND tipo_documento = ?
         AND numero_pedido = ? ";
         $resultadoSql = DB::update($sql,[$estado,$mensaje,$fechaHora,$centroOperacion,$bodega,$tipoDocumento,$numeroPedido]);
+    }
+
+    public function actualizarEstadoDocumentoFac($mensaje, $estado, $centroOperacion, $bodega, $tipoDocumento, $numeroFactura){
+        
+        $fechaHora = date('Y-m-d h:m:s');
+        $sql="update ".$this->tableFact." SET 
+        estadoenviows = ?,
+        msmovws = ?,
+        fechamovws = ?
+        where
+        centro_operacion = ?
+        AND bodega = ?
+        AND tipo_documento = ?
+        AND numero_factura = ? ";
+        $resultadoSql = DB::update($sql,[$estado,$mensaje,$fechaHora,$centroOperacion,$bodega,$tipoDocumento,$numeroFactura]);
     }
 
     public function getLogPedidos($filtros){

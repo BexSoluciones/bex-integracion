@@ -17,11 +17,11 @@ class DetalleFacturaModel extends Model
         'centro_operacion',
         'CODTIPODOC',
         'tipo_documento',
-        'numero_pedido',
+        'numero_factura',
         'bodega',
         'codigo_producto',
         'cantidad',
-        'precio_unitario',
+        'valor_bruto',
         'IVAMOV',
         'CODMOTDEV',
         'BONENTREGAPRODUCTO',
@@ -61,7 +61,7 @@ class DetalleFacturaModel extends Model
 
     public function obtenerDetalleFactura($numeroFactura,$centroOperacion,$tipoDocumento,$bodega){
 
-        $sql="select * from ".$this->table." where numero_pedido='".$numeroFactura."' AND centro_operacion='".$centroOperacion."' AND tipo_documento='".$tipoDocumento."' AND bodega='".$bodega."'";          
+        $sql="select * from ".$this->table." where numero_factura='".$numeroFactura."' AND centro_operacion='".$centroOperacion."' AND tipo_documento='".$tipoDocumento."' AND bodega='".$bodega."'";          
         $resultadoSql = DB::select($sql);
         return json_decode(json_encode($resultadoSql),true);
     }
