@@ -44,4 +44,6 @@ Route::get('email/verify/{id}/{hash}', 'Auth\VerificationController@verify')->na
 Route::post('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
 
 Route::get('/reenviopedido', 'integracionecomweb\ReenvioPedidoController@index')->name('reenviopedido');
+Route::get('/reenviofacturas', 'integracionecomweb\ReenvioPedidoController@indexfac')->name('reenviofacturas');
 Route::get('/reenviar-pedido', 'integracionecomweb\ReenvioPedidoController@reenviarPedido')->name('reenviar-pedido');
+Route::get('/reenviar-factura', 'integracionecomweb\ReenvioPedidoController@reenviarFactura')->name('reenviar-factura');
