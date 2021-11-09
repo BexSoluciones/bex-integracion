@@ -23,7 +23,7 @@ class FacturaCore
             $cadena = "";
             $cadena .= str_pad(1, 7, "0", STR_PAD_LEFT) . "00000001001\n"; // Linea 1
             if ($factura['tipo_documento'] == 'EUM' || $factura['tipo_documento'] == 'EUP' || $factura['tipo_documento'] == 'EUC' || $factura['tipo_documento'] == 'EUV') {
-                     
+                
                 // Crear estructura para VENTA (Docto. ventas comercial v1)
                 $cadena .= str_pad(2, 7, "0", STR_PAD_LEFT); //Numero de registros
                 $cadena .= str_pad(461, 4, "0", STR_PAD_LEFT); //Tipo de registro
@@ -108,8 +108,7 @@ class FacturaCore
                 $cadena .= '000'; //Numero de cuota
                 $cadena .= '000000000000000.0000'; // Valor cuota o valor a cruzar
                 $cadena .= '100.00'; //Porcentaje de la cuota respecto al  total del documento.
-                $fechaTresDias = strtotime($factura['fecha_factura']."+ 3 days");
-                $cadena .= substr($fechaTresDias,0,4).substr($fechaTresDias,5,2).substr($fechaTresDias,8,2); //Fecha de vencimiento de la cuota -- OJO SUMAR 3 DIAS MAS PARA FECHA VENCIMIENTO
+                $cadena .= substr($factura['fecha_venc'],0,4).substr($factura['fecha_venc'],5,2).substr($factura['fecha_venc'],8,2); //Fecha de vencimiento de la cuota -- OJO SUMAR 3 DIAS MAS PARA FECHA VENCIMIENTO
                 $cadena .= '000000000000000.0000'; //Valor descuento pronto pago
                 $cadena .= '000.00'; //Porcentaje del pronto pago con respecto a la cuota
                 $cadena .= substr($factura['fecha_factura'],0,4).substr($factura['fecha_factura'],5,2).substr($factura['fecha_factura'],8,2); //Fecha de pronto pago de la cuota
@@ -172,7 +171,7 @@ class FacturaCore
                         $cadena .= 'UNID'; //Unidad de medida del movimiento
                         $cadena .= str_pad(intval($detalleFactura['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
                         $cadena .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
-                        $cadena .= str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT) . '.0000'; //Valor bruto
+                        $cadena .= str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT) > '0' ? str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT). '.0000' : str_pad('1', 15, "0", STR_PAD_LEFT) . '.0000'; //Valor bruto
                         $cadena .= '2'; //Naturaleza de la transaccion
                         $cadena .= '0'; //Solo valor
                         $cadena .= '0'; //Impuestos asumidos
@@ -236,8 +235,7 @@ class FacturaCore
                 $cadena .= '000'; //Numero de cuota
                 $cadena .= '000000000000000.0000'; // Valor cuota o valor a cruzar
                 $cadena .= '100.00'; //Porcentaje de la cuota respecto al  total del documento.
-                $fechaTresDias = strtotime($factura['fecha_factura']."+ 3 days");
-                $cadena .= substr($fechaTresDias,0,4).substr($fechaTresDias,5,2).substr($fechaTresDias,8,2); //Fecha de vencimiento de la cuota -- OJO SUMAR 3 DIAS MAS PARA FECHA VENCIMIENTO
+                $cadena .= substr($factura['fecha_venc'],0,4).substr($factura['fecha_venc'],5,2).substr($factura['fecha_venc'],8,2); //Fecha de vencimiento de la cuota -- OJO SUMAR 3 DIAS MAS PARA FECHA VENCIMIENTO
                 $cadena .= '000000000000000.0000'; //Valor descuento pronto pago
                 $cadena .= '000.00'; //Porcentaje del pronto pago con respecto a la cuota
                 $cadena .= substr($factura['fecha_factura'],0,4).substr($factura['fecha_factura'],5,2).substr($factura['fecha_factura'],8,2); //Fecha de pronto pago de la cuota
@@ -300,7 +298,7 @@ class FacturaCore
                         $cadena .= 'UNID'; //Unidad de medida del movimiento
                         $cadena .= str_pad(intval($detalleFactura['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
                         $cadena .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
-                        $cadena .= str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT) . '.0000'; //Valor bruto
+                        $cadena .= str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT) > '0' ? str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT) . '.0000' : str_pad('1', 15, "0", STR_PAD_LEFT) . '.0000'; //Valor bruto
                         $cadena .= '2'; //Naturaleza de la transaccion
                         $cadena .= '0'; //Solo valor
                         $cadena .= '0'; //Impuestos asumidos
