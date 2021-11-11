@@ -92,7 +92,7 @@ class EncabezadoPedidoModel extends Model
 
     //DB
     public function obtenerPedidoEncabezado($estado){
-        $sql="select * from ".$this->table." where estadoenviows='".$estado."'";          
+        $sql="select * from ".$this->table." where estadoenviows='".$estado."' LIMIT 100";
         $resultadoSql = DB::select($sql);
         //log::info($resultadoSql);     
         return json_decode(json_encode($resultadoSql),true);
