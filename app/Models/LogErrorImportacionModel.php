@@ -3,8 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use DB;
-use Log;
+use Illuminate\Support\Facades\DB;
 
 class LogErrorImportacionModel extends Model
 {
@@ -13,8 +12,8 @@ class LogErrorImportacionModel extends Model
     protected $table="tbldmovenc";
     protected $tableFact ="tbldmovencfac";
 
-    public function actualizarEstadoDocumento($mensaje, $estado, $centroOperacion, $bodega, $tipoDocumento, $numeroPedido){
-        
+    public function actualizarEstadoDocumento($mensaje, $estado, $centroOperacion, $bodega, $tipoDocumento, $numeroPedido)
+    {
         $fechaHora = date('Y-m-d h:m:s');
         $sql="update ".$this->table." SET 
         estadoenviows = ?,
@@ -25,11 +24,11 @@ class LogErrorImportacionModel extends Model
         AND bodega = ?
         AND tipo_documento = ?
         AND numero_pedido = ? ";
-        $resultadoSql = DB::update($sql,[$estado,$mensaje,$fechaHora,$centroOperacion,$bodega,$tipoDocumento,$numeroPedido]);
+        $resultadoSql = DB::update($sql, [$estado,$mensaje,$fechaHora,$centroOperacion,$bodega,$tipoDocumento,$numeroPedido]);
     }
 
-    public function actualizarEstadoDocumentoFac($mensaje, $estado, $centroOperacion, $bodega, $tipoDocumento, $numeroFactura){
-        
+    public function actualizarEstadoDocumentoFac($mensaje, $estado, $centroOperacion, $bodega, $tipoDocumento, $numeroFactura)
+    {
         $fechaHora = date('Y-m-d h:m:s');
         $sql="update ".$this->tableFact." SET 
         estadoenviows = ?,
@@ -40,22 +39,20 @@ class LogErrorImportacionModel extends Model
         AND bodega = ?
         AND tipo_documento = ?
         AND numero_factura = ? ";
-        $resultadoSql = DB::update($sql,[$estado,$mensaje,$fechaHora,$centroOperacion,$bodega,$tipoDocumento,$numeroFactura]);
+        $resultadoSql = DB::update($sql, [$estado,$mensaje,$fechaHora,$centroOperacion,$bodega,$tipoDocumento,$numeroFactura]);
     }
 
-    public function getLogPedidos($filtros){
-
-        if(!empty($filtros)){
+    public function getLogPedidos($filtros)
+    {
+        if (!empty($filtros)) {
             $where = "";
-            foreach ($filtros as $key => $value){
+            foreach ($filtros as $key => $value) {
                 $where .= " and ".$key." = '".$value."'";
             }
-            //log::info($where);
             $sql="select centro_operacion, bodega, tipo_documento, numero_pedido, fecha_pedido, msmovws from ".$this->table." where estadoenviows = '3'". $where;
             $resultadoSql = DB::select($sql);
             return $resultadoSql;
-
-        }else {
+        } else {
             $sql="select centro_operacion, bodega, tipo_documento, numero_pedido, fecha_pedido, msmovws from ".$this->table." where estadoenviows = '3'";
             $resultadoSql = DB::select($sql);
             return $resultadoSql;
