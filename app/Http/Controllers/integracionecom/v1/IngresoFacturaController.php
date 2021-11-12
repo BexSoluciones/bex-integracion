@@ -8,8 +8,8 @@ use App\Models\EncabezadoFacturaModel;
 use App\Traits\TraitHerramientas;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Log;
-use Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class IngresoFacturaController extends Controller
 {
@@ -206,12 +206,15 @@ class IngresoFacturaController extends Controller
 
     public function validarDetalleFactura($datosDetalleFactura)
     {
-        $validator = $datosDetalleFactura->validator([
-            'codigo_producto' => 'required|min:4|max:15|different:NULL',
-            'lista_precio' => 'required|max:3',
+        
+        $rules = [
+            'codigo_producto' => 'required',
             'cantidad' => 'required|digits_between:1,15',
             'valor_bruto' => 'required|regex:/^[0-9]+(\.[0-9]{1,4})?$/',
-        ]);
+            'lista_precio'=>'required|max:3'
+        ];
+
+        $validator = Validator::make($datosDetalleFactura, $rules);
 
         if ($validator->fails()) {
             return [
