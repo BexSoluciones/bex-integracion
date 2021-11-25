@@ -20,7 +20,6 @@ class PedidoCore
 
     public function subirPedidoSiesa($pedido, $detallesPedido)
     {
-
         if (count($detallesPedido) > 0) {
             $importar = true;
             $cadena = "";
@@ -83,13 +82,13 @@ class PedidoCore
             $contadorDetallePedido = 1;
 
             foreach ($detallesPedido as $key => $detallePedido) {
-                //---Declarando variables
                 $listaPrecio = $detallePedido['lista_precio'];
                 $precioEnt = substr($detallePedido['precio_unitario'], 0, -3);
                 $precioDec = substr($detallePedido['precio_unitario'], -3);
                 $precioEnt = $precioEnt > '0' ? $precioEnt : '1';
-                $prepack = $this->validarCodPrepack($detallePedido['codigo_producto']) === true ? $detallePedido['codigo_producto'] : '';
-
+                
+                $validPrepack = $this->validarCodPrepack($detallePedido['codigo_producto']);
+                $prepack = ($validPrepack === true) ? $detallePedido['codigo_producto'] : '';
                 if (!empty($prepack)) {
                     $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
                     $cadena .= '0431'; // Tipo de registro
@@ -166,7 +165,6 @@ class PedidoCore
                     }
                 }
             }
-
             $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT) . "99990001001";
 
             $lineas = explode("\n", $cadena);
@@ -231,12 +229,13 @@ class PedidoCore
 
     public function validarCodPrepack($productoEcom)
     {
+        $resp = strpos($productoEcom, 'CO');
 
-        if (strpos($productoEcom, 'CO') === true) {
+        if ($resp === 0 ) {
             return true;
+        } else {
+            return false;
         }
-
-        return false;
     }
 
     public function obtenerCodigoProductoSiesa($productoEcom)
