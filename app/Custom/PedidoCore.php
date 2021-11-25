@@ -10,7 +10,6 @@ use App\Traits\TraitHerramientas;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
-
 class PedidoCore
 {
     use TraitHerramientas;
