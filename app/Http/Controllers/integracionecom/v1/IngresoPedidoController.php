@@ -7,8 +7,8 @@ use App\Models\DetallePedidoModel;
 use App\Models\EncabezadoPedidoModel;
 use App\Traits\TraitHerramientas;
 use Illuminate\Http\Request;
-use Log;
-use Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class IngresoPedidoController extends Controller
 {
@@ -38,9 +38,7 @@ class IngresoPedidoController extends Controller
 
     public function recibirPedidoJson(Request $request)
     {
-
         $respValidacion = $this->validarEstructuraJson($request);
-
 
         if ($respValidacion['valid'] == false) {
 
@@ -49,44 +47,41 @@ class IngresoPedidoController extends Controller
                 'code' => 412,
                 'errors' => $respValidacion['errors'],
             ], 412);
-
         }
-        $pedidosResp=[];
+        $pedidosResp = [];
         $pedidosRecib = $request->input('data');
+
         foreach ($pedidosRecib as $key => $value) {
-            $pedidosResp[$key]['tipo_documento']=$value['tipo_documento'];
-            $pedidosResp[$key]['numero_pedido']=$value['numero_pedido'];
+            $pedidosResp[$key]['tipo_documento'] = $value['tipo_documento'];
+            $pedidosResp[$key]['numero_pedido'] = $value['numero_pedido'];
         }
 
         try {
-
             $this->guardarEncabezadoPedido($request);
             $this->guardarDetallePedido($request);
 
             return response()->json([
                 'created' => true,
                 'code' => 201,
-                'errors' =>0 ,
-                'pedidos_recibidos'=>$pedidosResp
+                'errors' => 0,
+                'pedidos_recibidos' => $pedidosResp
             ], 201);
-
         } catch (\Exception $e) {
             Log::error("Error al guardar pedidos. Detalle error: {$e->getCode()},revisar linea: {$e->getLine()},{$e->getMessage()}");
             return response()->json([
                 'created' => false,
                 'code' => 500,
-                'errors' =>"Error de servidor por favor contactarse con el administrador",
+                'errors' => "Error de servidor por favor contactarse con el administrador",
             ], 500);
         }
-
     }
 
     public function guardarDetallePedido($request)
     {
-
         $pedidos = $request->input('data');
         $contadorItem = 0;
         $pedidoItem = [];
+
         foreach ($pedidos as $keya => $pedido) {
             $numeroPedido = $pedido['numero_pedido'];
             $centroOperacion = $pedido['centro_operacion'];
@@ -103,44 +98,41 @@ class IngresoPedidoController extends Controller
                 $contadorItem++;
             }
         }
-        
+
         DetallePedidoModel::insertOrIgnore($pedidoItem);
     }
 
     public function guardarEncabezadoPedido($request)
     {
-
         $pedidos = $request->input('data');
         $encabezadosPedidos = [];
         $contadorPedido = 0;
+
         foreach ($pedidos as $key => $value) {
             $nuevoArray = [];
-            $value['ip']=$this->getIpCliente();
-            foreach ($value as $campo => $valor) {                
+            $value['ip'] = $this->getIpCliente();
+            foreach ($value as $campo => $valor) {
                 if ($campo != 'detalle_pedido') {
                     $nuevoArray[$campo] = $valor;
                 }
             }
-            
+
             $encabezadosPedidos[$contadorPedido] = $nuevoArray;
             $contadorPedido++;
-
         }
-        
-        EncabezadoPedidoModel::insertOrIgnore($encabezadosPedidos);
 
+        EncabezadoPedidoModel::insertOrIgnore($encabezadosPedidos);
     }
 
     public function armarTablaInsertSql($tablaDestino)
     {
-
         $datos = $this->ejecutarConsulta();
 
         if (!empty($datos)) {
 
             //----se arma la tabla
             $campos = array_keys((array) $datos[0]);
-            
+
             $nuevoArrayCampos = [];
             foreach ($campos as $key => $campo) {
                 $nuevoArrayCampos[$key] = $campo . ' text';
@@ -154,6 +146,7 @@ class IngresoPedidoController extends Controller
             $sqlInsert = "INSERT INTO $tablaDestino ($camposInsertSql) values ";
             $arrayValues = [];
             $acumValues = 0;
+
             foreach ($datos as $key => $value) {
                 $arrayValuesRow = [];
                 foreach ($value as $keyb => $valores) {
@@ -164,7 +157,6 @@ class IngresoPedidoController extends Controller
                     } else {
                         $arrayValuesRow[$keyb] = "'" . $this->eliminarNumeroCadena(trim($valores)) . "'";
                     }
-
                 }
                 $valueInsert = implode(',', $arrayValuesRow);
                 $arrayValues[$acumValues] = "($valueInsert)";
@@ -182,12 +174,10 @@ class IngresoPedidoController extends Controller
         } else {
             Log::error("$this->cliente : error en la funcion " . __FUNCTION__ . " parametro datos vacío.");
         }
-
     }
 
     public function validarEstructuraJson($request)
     {
-
         //--------Valido que exista data
         $formatoValido = false;
         $formatoValido = $request->input('data') ?? false;
@@ -208,8 +198,9 @@ class IngresoPedidoController extends Controller
         $contEE = 0;
         $erroresDetalleNoDefinido = [];
         $contED = 0;
+
         foreach ($this->data as $key => $data) {
-            
+
             $datosEnc = $data;
             unset($datosEnc['detalle_pedido']);
             $datosEnc = $this->depurarCamposAutorizados(self::CAMPOS_AUTORIZADOS_ENCABEZADO, $datosEnc);
@@ -218,25 +209,25 @@ class IngresoPedidoController extends Controller
             if ($respValidarEncabezado['valid'] == false) {
 
                 $erroresEncabezado[$contEE] = $respValidarEncabezado['errors'];
-                $erroresTotal ['registro_'.($key+1)]['tipo_documento'] = $data['tipo_documento'];
-                $erroresTotal ['registro_'.($key+1)]['numero_pedido'] = $data['numero_pedido'];
-                $erroresTotal['registro_'.($key+1)]['error_encabezado_pedido'] = $erroresEncabezado;
+                $erroresTotal['registro_' . ($key + 1)]['tipo_documento'] = $data['tipo_documento'];
+                $erroresTotal['registro_' . ($key + 1)]['numero_pedido'] = $data['numero_pedido'];
+                $erroresTotal['registro_' . ($key + 1)]['error_encabezado_pedido'] = $erroresEncabezado;
                 $contEE++;
             }
 
             $formatoValido = false;
             $formatoValido = $request->input('data.' . $key . '.detalle_pedido') ?? false;
-            
+
             if (!$formatoValido) {
-                $erroresTotal['registro_'.($key+1)]['error_detalle_pedido'] = "Formato json no válido, detalle pedido " . $data['numero_pedido'] . " no está definido";
+                $erroresTotal['registro_' . ($key + 1)]['error_detalle_pedido'] = "Formato json no válido, detalle pedido " . $data['numero_pedido'] . " no está definido";
                 $contED++;
-            } elseif($formatoValido) {
-                
+            } elseif ($formatoValido) {
+
                 $item = 1;
                 $erroresDetallePedido = [];
                 foreach ($data['detalle_pedido'] as $keyb => $detallePedido) {
-                    
-                    $detallePedido=$this->depurarCamposAutorizados(self::CAMPOS_AUTORIZADOS_DETALLE, $detallePedido);
+
+                    $detallePedido = $this->depurarCamposAutorizados(self::CAMPOS_AUTORIZADOS_DETALLE, $detallePedido);
                     $respValidacion = $this->validarDetallePedido($detallePedido);
                     if ($respValidacion['valid'] == false) {
                         $erroresDetallePedido['item_' . $item] = $respValidacion['errors'];
@@ -244,15 +235,13 @@ class IngresoPedidoController extends Controller
 
                     $item++;
                 }
-                if(count($erroresDetallePedido)>0){
-                    $erroresTotal ['registro_'.($key+1)]['tipo_documento'] = $data['tipo_documento'];
-                    $erroresTotal ['registro_'.($key+1)]['numero_pedido'] = $data['numero_pedido'];
-                    $erroresTotal['registro_'.($key+1)]['error_detalle_pedido'] = $erroresDetallePedido;
+                if (count($erroresDetallePedido) > 0) {
+                    $erroresTotal['registro_' . ($key + 1)]['tipo_documento'] = $data['tipo_documento'];
+                    $erroresTotal['registro_' . ($key + 1)]['numero_pedido'] = $data['numero_pedido'];
+                    $erroresTotal['registro_' . ($key + 1)]['error_detalle_pedido'] = $erroresDetallePedido;
                     $contED++;
                 }
-                
             }
-
         }
 
         if (count($erroresTotal) > 0) {
@@ -266,15 +255,11 @@ class IngresoPedidoController extends Controller
                 'errors' => 0,
             ];
         }
-
-        
-
     }
 
     public function validarEncabezadoPedido($datosEncPedido)
     {
         //------Elimino detalle pedido el cual no esta dentro de esta validación
-
         $datosEncPedido = $this->decodificarArray($datosEncPedido);
 
         $rules = [
@@ -292,7 +277,7 @@ class IngresoPedidoController extends Controller
         ];
 
         $validator = Validator::make($datosEncPedido, $rules);
-        
+
         if ($validator->fails()) {
             return [
                 'valid' => false,
@@ -304,12 +289,10 @@ class IngresoPedidoController extends Controller
                 'errors' => 0,
             ];
         }
-
     }
 
     public function validarDetallePedido($datosDetallePedido)
     {
-
         $rules = [
             'codigo_producto' => 'required',
             'lista_precio' => 'required|size:2',
@@ -317,7 +300,7 @@ class IngresoPedidoController extends Controller
             'precio_unitario' => 'required|regex:/^[0-9]+(\.[0-9]{1,4})?$/',
         ];
         $validator = Validator::make($datosDetallePedido, $rules);
-        
+
         if ($validator->fails()) {
             return [
                 'valid' => false,
@@ -329,12 +312,10 @@ class IngresoPedidoController extends Controller
                 'errors' => 0,
             ];
         }
-
     }
 
     public function depurarCamposAutorizados($camposAutorizados, $data)
     {
-
         $nuevoArray = [];
         foreach ($data as $campo => $valor) {
 
@@ -343,14 +324,11 @@ class IngresoPedidoController extends Controller
                 if ($value['campo'] === $campo) {
                     $nuevoArray[$campo] = $valor;
                 }
-
             }
-
         }
 
         return $nuevoArray;
     }
-
 }
         // GENERAR JSON DE GRANDES REGISTROS
         // $json= '

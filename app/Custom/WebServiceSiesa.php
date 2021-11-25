@@ -3,9 +3,9 @@
 namespace App\Custom;
 
 use App\Models\ConexionesModel;
-use Log;
+use Illuminate\Support\Facades\Log;
 use SoapClient;
-use DB;
+use Illuminate\Support\Facades\DB;
 
 class WebServiceSiesa
 {
@@ -36,26 +36,24 @@ class WebServiceSiesa
         $this->clave = $config->siesa_clave;
         $this->ConsultaSql = $config->siesa_consulta;
         $this->cliente = $config->razon_social;
-
     }
 
-    public function ejecutarConsulta($parametrosSql = null,$paginacion=false)
+    public function ejecutarConsulta($parametrosSql = null, $paginacion = false)
     {
         if (is_array($parametrosSql)) {
-            $parm = $this->getParametrosXml($parametrosSql,$paginacion);
+            $parm = $this->getParametrosXml($parametrosSql, $paginacion);
         } else {
             $parm = $this->getParametrosXml();
         }
 
-        try
-        {
+        try {
             $client = new SoapClient($this->url, $parm);
             $result = $client->EjecutarConsultaXML($parm); //llamamos al métdo que nos interesa con los parámetros
             $schema = @simplexml_load_string($result->EjecutarConsultaXMLResult->schema);
             $any = @simplexml_load_string($result->EjecutarConsultaXMLResult->any);
 
             if (@is_object($any->NewDataSet->Resultado)) {
-                
+
                 return $this->convertirObjetosArrays($any->NewDataSet->Resultado);
             }
 
@@ -66,29 +64,26 @@ class WebServiceSiesa
                     Log::info("\n " . $this->cliente . " Error Linea:\t " . $value->F_NRO_LINEA);
                     Log::info("\n " . $this->cliente . " Error Value:\t " . $value->F_VALOR);
                     Log::info("\n " . $this->cliente . " Error Desc:\t " . $value->F_DETALLE);
-
                 }
             }
-
         } catch (\Exception $e) {
             $error = $e->getMessage();
             Log::info($error);
         }
     }
 
-    public function ejecutarSql($sqlServer){
+    public function ejecutarSql($sqlServer)
+    {
+        $parm = $this->getParamXml($sqlServer);
 
-        $parm=$this->getParamXml($sqlServer);
-
-        try
-        {
+        try {
             $client = new SoapClient($this->url, $parm);
-            $result = $client->EjecutarConsultaXML($parm); 
+            $result = $client->EjecutarConsultaXML($parm);
             $schema = @simplexml_load_string($result->EjecutarConsultaXMLResult->schema);
             $any    = @simplexml_load_string($result->EjecutarConsultaXMLResult->any);
 
             if (@is_object($any->NewDataSet->Resultado)) {
-                
+
                 return $this->convertirObjetosArrays($any->NewDataSet->Resultado);
             }
 
@@ -99,23 +94,17 @@ class WebServiceSiesa
                     Log::info("\n " . $this->cliente . " Error Linea:\t " . $value->F_NRO_LINEA);
                     Log::info("\n " . $this->cliente . " Error Value:\t " . $value->F_VALOR);
                     Log::info("\n " . $this->cliente . " Error Desc:\t " . $value->F_DETALLE);
-
                 }
             }
-
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             $error = $e->getMessage();
             Log::info($error);
         }
-
     }
 
     public function importarXml($xml)
     {
-
-        try
-        {
-
+        try {
             $pvstrDatos = "<?xml version='1.0' encoding='utf-8'?>
 									<Importar>
 									   <NombreConexion>" . $this->conexion . "</NombreConexion>
@@ -133,29 +122,23 @@ class WebServiceSiesa
             $parm['cache_wsdl'] = 0; //new
             $client = new SoapClient($this->url, $parm);
             $result = $client->ImportarXML($parm); //llamamos al métdo que nos interesa con los parámetros
-            
+
             $schema = simplexml_load_string($result->ImportarXMLResult->schema);
             return $any = simplexml_load_string($result->ImportarXMLResult->any);
-
-            
-           
-
         } catch (\Exception $fault) {
 
-            $error = $fault->getMessage();   
-            Log::info('======este es mensaje de error de conexion ======'); 
-            Log::error($error); 
+            $error = $fault->getMessage();
+            Log::info('======este es mensaje de error de conexion ======');
+            Log::error($error);
             return [
-                'conexion_exitosa'=>false,
-                'error'=>$error
-            ];        
+                'conexion_exitosa' => false,
+                'error' => $error
+            ];
         }
-
     }
 
     public function armarTablaInsertSql($tablaDestino)
     {
-
         $datos = $this->ejecutarConsulta();
 
         if (!empty($datos)) {
@@ -185,7 +168,6 @@ class WebServiceSiesa
                     } else {
                         $arrayValuesRow[$keyb] = "'" . $this->eliminarNumeroCadena(trim($valores)) . "'";
                     }
-
                 }
                 $valueInsert = implode(',', $arrayValuesRow);
                 $arrayValues[$acumValues] = "($valueInsert)";
@@ -203,24 +185,16 @@ class WebServiceSiesa
         } else {
 
             Log::error("$this->cliente : error en la funcion " . __FUNCTION__ . " parametro datos vacío.");
-
         }
-
     }
 
-    public function getParametrosXml($parametrosSql = null,$paginacion=false)
+    public function getParametrosXml($parametrosSql = null, $paginacion = false)
     {
-
-        
         if (is_array($parametrosSql)) {
-            $this->ConsultaSql = $this->reemplazarParametros($parametrosSql, $this->ConsultaSql,$paginacion);
+            $this->ConsultaSql = $this->reemplazarParametros($parametrosSql, $this->ConsultaSql, $paginacion);
         }
 
-        $this->ConsultaSql=$this->aplicarIdentificadoresSql($this->ConsultaSql);
-
-        
-
-        
+        $this->ConsultaSql = $this->aplicarIdentificadoresSql($this->ConsultaSql);
 
         $parm['pvstrxmlParametros'] = "<Consulta>
 												<NombreConexion>" . $this->conexion . "</NombreConexion>
@@ -240,13 +214,13 @@ class WebServiceSiesa
         return $parm;
     }
 
-    public function aplicarIdentificadoresSql($consultaSql){
-        return "SET QUOTED_IDENTIFIER OFF; \n".$consultaSql." \n SET QUOTED_IDENTIFIER ON;";
+    public function aplicarIdentificadoresSql($consultaSql)
+    {
+        return "SET QUOTED_IDENTIFIER OFF; \n" . $consultaSql . " \n SET QUOTED_IDENTIFIER ON;";
     }
 
     public function getParamXml($consultaSql)
     {
-
         $parm['pvstrxmlParametros'] = "<Consulta>
 												<NombreConexion>" . $this->conexion . "</NombreConexion>
 												<IdCia>" . $this->idCia . "</IdCia>
@@ -255,7 +229,7 @@ class WebServiceSiesa
 												<Usuario>" . $this->usuario . "</Usuario>
 												<Clave>" . $this->clave . "</Clave>
 												<Parametros>
-													<Sql>" . $consultaSql. "</Sql>
+													<Sql>" . $consultaSql . "</Sql>
 												</Parametros>
 											</Consulta>";
 
@@ -270,44 +244,40 @@ class WebServiceSiesa
         return str_replace("'", "", $cadena);
     }
 
-    public function reemplazarParametros($parametros, $consultaSql,$paginacion=false)
+    public function reemplazarParametros($parametros, $consultaSql, $paginacion = false)
     {
-
-        
-        $seccionPaginacion="OFFSET **desde** ROWS FETCH NEXT **hasta** ROWS ONLY;";
+        $seccionPaginacion = "OFFSET **desde** ROWS FETCH NEXT **hasta** ROWS ONLY;";
 
         if (is_null($consultaSql)) {
             Log::error("El parametro consultasql es obligatoria. Por favor revise este campo en tabla conexion");
         }
 
         $nuevaConsultaSql = $consultaSql;
-        
+
         foreach ($parametros as $key => $parametro) {
-            
-            foreach ($parametro as $param => $valor) { 
-                $nuevaConsultaSql = str_replace('**'.$param.'**',$valor , $nuevaConsultaSql);
-                if($param=='desde' || $param=='hasta'){
-                    $seccionPaginacion = str_replace('**'.$param.'**',$valor , $seccionPaginacion);                    
+
+            foreach ($parametro as $param => $valor) {
+                $nuevaConsultaSql = str_replace('**' . $param . '**', $valor, $nuevaConsultaSql);
+                if ($param == 'desde' || $param == 'hasta') {
+                    $seccionPaginacion = str_replace('**' . $param . '**', $valor, $seccionPaginacion);
                 }
             }
-
         }
 
-        if($paginacion){
-            $nuevaConsultaSql = str_replace('**paginacion**',$seccionPaginacion , $nuevaConsultaSql);
-        }else{
-            $nuevaConsultaSql = str_replace('**paginacion**','', $nuevaConsultaSql);
+        if ($paginacion) {
+            $nuevaConsultaSql = str_replace('**paginacion**', $seccionPaginacion, $nuevaConsultaSql);
+        } else {
+            $nuevaConsultaSql = str_replace('**paginacion**', '', $nuevaConsultaSql);
         }
-    
+
         return $nuevaConsultaSql;
-
     }
 
-    public function selectConteo($consultaSql){
+    // public function selectConteo($consultaSql)
+    // {
 
-        $explodeConsultaSql=explode("ORDER");
-
-    }
+    //     $explodeConsultaSql = explode("ORDER");
+    // }
 
     public function getConexionesModel()
     {
@@ -321,7 +291,7 @@ class WebServiceSiesa
         foreach ($objetos as $key => $objeto) {
             $arrayValuesRow = [];
             foreach ($objeto as $keyb => $valores) {
-                $arrayValuesRow[(String) $keyb] = (String) $valores;
+                $arrayValuesRow[(string) $keyb] = (string) $valores;
             }
             $arrayValues[$acumValues] = (array) $arrayValuesRow;
             $acumValues++;
@@ -329,5 +299,4 @@ class WebServiceSiesa
 
         return $arrayValues;
     }
-
 }

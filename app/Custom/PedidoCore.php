@@ -3,14 +3,12 @@
 namespace App\Custom;
 
 use App\Custom\WebServiceSiesa;
-use App\Models\EncabezadoPedidoModel;
-use App\Models\DetallePedidoModel;
 use App\Models\BodegasTiposDocModel;
 use App\Models\ConexionesModel;
 use App\Models\LogErrorImportacionModel;
 use App\Traits\TraitHerramientas;
-use Log;
-use Storage;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 
 class PedidoCore
@@ -19,12 +17,11 @@ class PedidoCore
 
     public function __construct()
     {
-        
     }
 
-    public function subirPedidoSiesa($pedido,$detallesPedido)
+    public function subirPedidoSiesa($pedido, $detallesPedido)
     {
-        
+
         if (count($detallesPedido) > 0) {
             $importar = true;
             $cadena = "";
@@ -41,7 +38,7 @@ class PedidoCore
             $cadena .= $pedido['centro_operacion']; //Centro de operación del documento
             $cadena .= $pedido['tipo_documento']; //Tipo de documento
             $cadena .= str_pad($pedido['numero_pedido'], 8, "0", STR_PAD_LEFT); //Numero documento
-            $cadena .= substr($pedido['fecha_pedido'],0,4).substr($pedido['fecha_pedido'],5,2).substr($pedido['fecha_pedido'],8,2); //Fecha del documento
+            $cadena .= substr($pedido['fecha_pedido'], 0, 4) . substr($pedido['fecha_pedido'], 5, 2) . substr($pedido['fecha_pedido'], 8, 2); //Fecha del documento
             $cadena .= '502'; //Clase interna del documento
             $cadena .= '2'; //Estado del documento
             $cadena .= '0'; //Indicador backorder del documento
@@ -85,66 +82,90 @@ class PedidoCore
             //Creacion Detalle - movimientos pedido
             $contador = 3;
             $contadorDetallePedido = 1;
-            
+
             foreach ($detallesPedido as $key => $detallePedido) {
                 //---Declarando variables
                 $listaPrecio = $detallePedido['lista_precio'];
                 $precioEnt = substr($detallePedido['precio_unitario'], 0, -3);
-                $precioDec= substr($detallePedido['precio_unitario'], -3);
+                $precioDec = substr($detallePedido['precio_unitario'], -3);
                 $precioEnt = $precioEnt > '0' ? $precioEnt : '1';
-                $productoSiesa = $this->obtenerCodigoProductoSiesa($detallePedido['codigo_producto']);
-                
-                if (!empty($productoSiesa)) {
-                    
-                    $codigoProductoSiesa = $productoSiesa[0]['codigo_producto'];
-                    
-                
-                    //$vendedor=$this->obtenerVendedor($pedido['bodega'],$pedido['tipo_documento'],$pedido['centro_operacion']);
+                $prepack = $this->validarCodPrepack($detallePedido['codigo_producto']) === true ? $detallePedido['codigo_producto'] : '';
 
+                if (!empty($prepack)) {
                     $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
-                    $cadena .= '0431'; //Tipo registro
-                    $cadena .= '00'; //Subtipo registro
-                    $cadena .= '02'; //Version del tipo de registro
+                    $cadena .= '0431'; // Tipo de registro
+                    $cadena .= '0003'; // Subtipo de registro - Version del tipo de registro
                     $cadena .= '001'; //compañia
                     $cadena .= $pedido['centro_operacion']; //Centro de operacion
                     $cadena .= $pedido['tipo_documento']; //Tipo de documento
                     $cadena .= str_pad($pedido['numero_pedido'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
-                    $cadena .= str_pad($contadorDetallePedido, 10, "0", STR_PAD_LEFT); //Numero de registro --> hacer contador
-                    $cadena .= str_pad($codigoProductoSiesa, 7, "0", STR_PAD_LEFT); //Item
-                    $cadena .= str_pad('', 50, " ", STR_PAD_LEFT); //Referencia item
-                    $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Codigo de barras
-                    $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 1
-                    $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 2
-                    $cadena .= $pedido['bodega']; //Bodega
-                    $cadena .= '501'; //Concepto
-                    $cadena .= '01'; //Motivo
-                    $cadena .= '0'; //Indicador de obsequio
-                    $cadena .= $pedido['centro_operacion']; //Centro de operacion movimiento
-                    $cadena .= str_pad('01', 20, " ", STR_PAD_RIGHT); //Unidad de negocio movimiento
-                    $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Centro de costo movimiento
-                    $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Proyecto
-                    $cadena .= $this->sumarDias(date('Ymd'), 1); //Fecha de entrega del pedido
-                    $cadena .= '000'; //Nro. dias de entrega del documento
-                    $cadena .= str_pad($listaPrecio, 3, " ", STR_PAD_RIGHT); //Lista de precio-->agregar al migrar productos
-                    $cadena .= 'UNID'; //Unidad de medida-->pendiente
+                    $cadena .= "0005214"; //0002432 Item
+                    $cadena .= str_pad("", 50, " ", STR_PAD_LEFT); // Referencia item
+                    $cadena .= str_pad("", 20, " ", STR_PAD_LEFT); // Codigo de barras
+                    $cadena .= str_pad($prepack, 20, " ", STR_PAD_RIGHT); // Código del paquete
+                    $cadena .= $pedido['bodega']; // Bodega
+                    $cadena .= "501"; // Concepto
+                    $cadena .= "01"; // Motivo
+                    $cadena .= $pedido['centro_operacion']; // Centro de operación movimiento
+                    $cadena .= str_pad("99", 20, " ", STR_PAD_RIGHT); // Unidad de negocio movimiento
+                    $cadena .= str_pad("", 15, " ", STR_PAD_LEFT); // Centro de costo movimiento
+                    $cadena .= str_pad("", 15, " ", STR_PAD_LEFT); // Proyecto
+                    $cadena .= substr($pedido['fecha_pedido'], 0, 4) . substr($pedido['fecha_pedido'], 5, 2) . substr($pedido['fecha_pedido'], 8, 2); // Fecha entrega del pedido
+                    $cadena .= "000"; // Nro. dias de entrega del documento
+                    $cadena .= str_pad($listaPrecio, 3, " ", STR_PAD_RIGHT); // Lista de precio
                     $cadena .= str_pad(intval($detallePedido['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
-                    $cadena .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
-                    $cadena .= str_pad($precioEnt, 15, "0", STR_PAD_LEFT) . str_pad($precioDec, 5, "0", STR_PAD_RIGHT);; //Precio unitario
-                    $cadena .= '0'; //Impuestos asumidos
-                    $cadena .= str_pad('', 255, " ", STR_PAD_LEFT); //Notas
-                    $cadena .= str_pad('', 2000, " ", STR_PAD_LEFT); //Descripcion
-                    $cadena .= '5'; //Indicador backorder del movimiento
-                    $cadena .= '2'; //Indicador de precio
-                    $cadena .= "\n";
-                    $contador++;
-                    $contadorDetallePedido++;
-                }else {
-                    $error = 'El siguiente producto en el pedido relacionado no existe '.$detallePedido['codigo_producto'];
-                    $estado = "3";
-                    $importar = false;
-                    $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
-                    
-                }  
+                    $cadena .= str_pad("", 255, " ", STR_PAD_LEFT); // Notas
+                    $cadena .= str_pad("", 2000, " ", STR_PAD_LEFT); // Descripcion
+                    $cadena .= "5"; // Indicador backorder del movimiento
+                } else {
+                    if (!empty($productoSiesa)) {
+                        $productoSiesa = $this->obtenerCodigoProductoSiesa($detallePedido['codigo_producto']);
+                        $codigoProductoSiesa = $productoSiesa[0]['codigo_producto'];
+
+                        $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
+                        $cadena .= '0431'; //Tipo registro
+                        $cadena .= '00'; //Subtipo registro
+                        $cadena .= '02'; //Version del tipo de registro
+                        $cadena .= '001'; //compañia
+                        $cadena .= $pedido['centro_operacion']; //Centro de operacion
+                        $cadena .= $pedido['tipo_documento']; //Tipo de documento
+                        $cadena .= str_pad($pedido['numero_pedido'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
+                        $cadena .= str_pad($contadorDetallePedido, 10, "0", STR_PAD_LEFT); //Numero de registro --> hacer contador
+                        $cadena .= str_pad($codigoProductoSiesa, 7, "0", STR_PAD_LEFT); //Item
+                        $cadena .= str_pad('', 50, " ", STR_PAD_LEFT); //Referencia item
+                        $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Codigo de barras
+                        $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 1
+                        $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 2
+                        $cadena .= $pedido['bodega']; //Bodega
+                        $cadena .= '501'; //Concepto
+                        $cadena .= '01'; //Motivo
+                        $cadena .= '0'; //Indicador de obsequio
+                        $cadena .= $pedido['centro_operacion']; //Centro de operacion movimiento
+                        $cadena .= str_pad('01', 20, " ", STR_PAD_RIGHT); //Unidad de negocio movimiento
+                        $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Centro de costo movimiento
+                        $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Proyecto
+                        $cadena .= $this->sumarDias(date('Ymd'), 1); //Fecha de entrega del pedido
+                        $cadena .= '000'; //Nro. dias de entrega del documento
+                        $cadena .= str_pad($listaPrecio, 3, " ", STR_PAD_RIGHT); //Lista de precio-->agregar al migrar productos
+                        $cadena .= 'UNID'; //Unidad de medida-->pendiente
+                        $cadena .= str_pad(intval($detallePedido['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
+                        $cadena .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
+                        $cadena .= str_pad($precioEnt, 15, "0", STR_PAD_LEFT) . str_pad($precioDec, 5, "0", STR_PAD_RIGHT); //Precio unitario
+                        $cadena .= '0'; //Impuestos asumidos
+                        $cadena .= str_pad('', 255, " ", STR_PAD_LEFT); //Notas
+                        $cadena .= str_pad('', 2000, " ", STR_PAD_LEFT); //Descripcion
+                        $cadena .= '5'; //Indicador backorder del movimiento
+                        $cadena .= '2'; //Indicador de precio
+                        $cadena .= "\n";
+                        $contador++;
+                        $contadorDetallePedido++;
+                    } else {
+                        $error = 'El siguiente producto en el pedido relacionado no existe ' . $detallePedido['codigo_producto'];
+                        $estado = "3";
+                        $importar = false;
+                        $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
+                    }
+                }
             }
 
             $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT) . "99990001001";
@@ -156,70 +177,67 @@ class PedidoCore
             $xmlPedido = $this->crearXmlPedido($lineas, $pedido['numero_pedido']);
 
             if (!$this->existePedidoSiesa('1', $pedido['tipo_documento'], str_pad($pedido['numero_pedido'], 15, "Y", STR_PAD_LEFT)) && $importar === true) {
-                
+
                 // Log::info("ejecutando funcion ".__FUNCTION__." .Pedido = ".$pedido['numero_pedido']);
 
                 $resp = $this->getWebServiceSiesa(28)->importarXml($xmlPedido);
 
-                
+
                 if (!is_array($resp) && empty($resp)) {
 
                     $error = 'Ok';
                     $estado = "2";
                     $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
-                    
                 } else {
-                    
-                    if(is_array($resp)){
-                        
-                        $error=$resp['error'];
+
+                    if (is_array($resp)) {
+
+                        $error = $resp['error'];
                         $estado = "4";
                         $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
-                    }else{
+                    } else {
                         $mensaje = "";
                         foreach ($resp->NewDataSet->Table as $key => $errores) {
-                            
+
                             $error = "";
                             foreach ($errores as $key => $detalleError) {
                                 if ($key == 'f_detalle') {
                                     $error = $detalleError;
                                 }
                             }
-                            
-
                         }
 
-                        if( strrpos($error, "el tercero vendedor no existe o no esta configurado como vendedor")!==false){
+                        if (strrpos($error, "el tercero vendedor no existe o no esta configurado como vendedor") !== false) {
 
-                            $error.=" Nombre vendedor: ".$pedido['vendedor']." Cedula vendedor: ".$pedido['cedula_vendedor'];
+                            $error .= " Nombre vendedor: " . $pedido['vendedor'] . " Cedula vendedor: " . $pedido['cedula_vendedor'];
                             $estado = "3";
                             $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
-
-                        }else{
+                        } else {
                             $estado = "3";
                             $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
-
                         }
-                        
                     }
-                    
                 }
-
             } elseif ($this->existePedidoSiesa('1', $pedido['tipo_documento'], str_pad($pedido['numero_pedido'], 15, "Y", STR_PAD_LEFT))) {
                 $error = "Este pedido ya fue registrado anteriormente, por favor verificar. Fecha de ejecucion: " . date('Y-m-d h:i:s');
                 $estado = "2";
                 $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
-
             }
-
-        }else {
+        } else {
             $error = 'El pedido no tiene productos asignados';
             $estado = "3";
             $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
+        }
+    }
 
+    public function validarCodPrepack($productoEcom)
+    {
+
+        if (strpos($productoEcom, 'CO') === true) {
+            return true;
         }
 
-
+        return false;
     }
 
     public function obtenerCodigoProductoSiesa($productoEcom)
@@ -228,7 +246,6 @@ class PedidoCore
             ['PARAMETRO1' => $productoEcom],
         ];
         return $this->getWebServiceSiesa(34)->ejecutarConsulta($parametros);
-
     }
 
     public function getWebServiceSiesa($idConexion)
@@ -259,7 +276,6 @@ class PedidoCore
     {
         $objErrorImpPed = new LogErrorImportacionModel();
         $result = $objErrorImpPed->actualizarEstadoDocumento($mensaje, $estado, $centroOperacion, $bodega, $tipoDocumento, $numeroPedido);
-        
     }
 
     public function crearXmlPedido($lineas, $idOrder)
@@ -286,8 +302,8 @@ class PedidoCore
         Storage::disk('local')->put('pandapan/pedidos/' . $nombreArchivo, $xmlPedido);
 
         return $datos;
-
     }
+
     public function getConexionesModel()
     {
         return new ConexionesModel();
@@ -308,7 +324,5 @@ class PedidoCore
         } else {
             return false;
         }
-
     }
-
 }
