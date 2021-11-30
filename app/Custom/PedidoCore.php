@@ -86,11 +86,12 @@ class PedidoCore
                 $precioEnt = substr($detallePedido['precio_unitario'], 0, -3);
                 $precioDec = substr($detallePedido['precio_unitario'], -3);
                 $precioEnt = $precioEnt > '0' ? $precioEnt : '1';
-                
+
                 $validPrepack = $this->validarCodPrepack($detallePedido['codigo_producto']);
                 $prepack = ($validPrepack === true) ? $detallePedido['codigo_producto'] : '';
                 if (!empty($prepack)) {
                     $codPrepack = $this->obtenerCodigoPrepackSiesa('1', $prepack);
+
                     if (!empty($codPrepack)) {
                         $codProductoPrepack = $codPrepack[0]['codigo_prepack'];
                         $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
@@ -128,7 +129,7 @@ class PedidoCore
                     }
                 } else {
                     $productoSiesa = $this->obtenerCodigoProductoSiesa($detallePedido['codigo_producto']);
-                    
+
                     if (!empty($productoSiesa)) {
                         $codigoProductoSiesa = $productoSiesa[0]['codigo_producto'];
 
@@ -193,21 +194,17 @@ class PedidoCore
 
 
                 if (!is_array($resp) && empty($resp)) {
-
                     $error = 'Ok';
                     $estado = "2";
                     $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
                 } else {
-
                     if (is_array($resp)) {
-
                         $error = $resp['error'];
                         $estado = "4";
                         $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
                     } else {
                         $mensaje = "";
                         foreach ($resp->NewDataSet->Table as $key => $errores) {
-
                             $error = "";
                             foreach ($errores as $key => $detalleError) {
                                 if ($key == 'f_detalle') {
@@ -217,7 +214,6 @@ class PedidoCore
                         }
 
                         if (strrpos($error, "el tercero vendedor no existe o no esta configurado como vendedor") !== false) {
-
                             $error .= " Nombre vendedor: " . $pedido['vendedor'] . " Cedula vendedor: " . $pedido['cedula_vendedor'];
                             $estado = "3";
                             $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
@@ -242,8 +238,8 @@ class PedidoCore
     public function validarCodPrepack($productoEcom)
     {
         $resp = strpos($productoEcom, 'CO');
-        
-        if ($resp === 0 ) {
+
+        if ($resp === 0) {
             return true;
         } else {
             return false;
@@ -274,7 +270,6 @@ class PedidoCore
 
     public function validarTipoDocumento($tipoDoc, $bodega)
     {
-
         $objBodegaTipoDo = new BodegasTiposDocModel();
         $resp = $objBodegaTipoDo->validarTipoDocumento($tipoDoc, $bodega);
 
@@ -299,7 +294,6 @@ class PedidoCore
 
     public function crearXmlPedido($lineas, $idOrder)
     {
-
         $datosConexionSiesa = $this->getConexionesModel()->getConexionXid(14);
         $xmlPedido = "<?xml version='1.0' encoding='utf-8'?>
         <Importar>
@@ -309,8 +303,8 @@ class PedidoCore
         <Clave>" . $datosConexionSiesa->siesa_clave . "</Clave>
         <Datos>\n";
         $datos = "";
-        foreach ($lineas as $key => $linea) {
 
+        foreach ($lineas as $key => $linea) {
             $xmlPedido .= "        <Linea>" . $linea . "</Linea>\n";
             $datos .= "        <Linea>" . $linea . "</Linea>\n";
         }
@@ -330,7 +324,6 @@ class PedidoCore
 
     public function existePedidoSiesa($idCia, $tipoDocumento, $numDoctoReferencia)
     {
-
         $parametros = [
             ['PARAMETRO1' => $idCia],
             ['PARAMETRO2' => $tipoDocumento],
