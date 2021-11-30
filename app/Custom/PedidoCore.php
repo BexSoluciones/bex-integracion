@@ -90,34 +90,46 @@ class PedidoCore
                 $validPrepack = $this->validarCodPrepack($detallePedido['codigo_producto']);
                 $prepack = ($validPrepack === true) ? $detallePedido['codigo_producto'] : '';
                 if (!empty($prepack)) {
-                    $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
-                    $cadena .= '0431'; // Tipo de registro
-                    $cadena .= '0003'; // Subtipo de registro - Version del tipo de registro
-                    $cadena .= '001'; //compañia
-                    $cadena .= $pedido['centro_operacion']; //Centro de operacion
-                    $cadena .= $pedido['tipo_documento']; //Tipo de documento
-                    $cadena .= str_pad($pedido['numero_pedido'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
-                    $cadena .= "0005214"; //0002432 Item
-                    $cadena .= str_pad("", 50, " ", STR_PAD_LEFT); // Referencia item
-                    $cadena .= str_pad("", 20, " ", STR_PAD_LEFT); // Codigo de barras
-                    $cadena .= str_pad($prepack, 20, " ", STR_PAD_RIGHT); // Código del paquete
-                    $cadena .= $pedido['bodega']; // Bodega
-                    $cadena .= "501"; // Concepto
-                    $cadena .= "01"; // Motivo
-                    $cadena .= $pedido['centro_operacion']; // Centro de operación movimiento
-                    $cadena .= str_pad("99", 20, " ", STR_PAD_RIGHT); // Unidad de negocio movimiento
-                    $cadena .= str_pad("", 15, " ", STR_PAD_LEFT); // Centro de costo movimiento
-                    $cadena .= str_pad("", 15, " ", STR_PAD_LEFT); // Proyecto
-                    $cadena .= substr($pedido['fecha_pedido'], 0, 4) . substr($pedido['fecha_pedido'], 5, 2) . substr($pedido['fecha_pedido'], 8, 2); // Fecha entrega del pedido
-                    $cadena .= "000"; // Nro. dias de entrega del documento
-                    $cadena .= str_pad($listaPrecio, 3, " ", STR_PAD_RIGHT); // Lista de precio
-                    $cadena .= str_pad(intval($detallePedido['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
-                    $cadena .= str_pad("", 255, " ", STR_PAD_LEFT); // Notas
-                    $cadena .= str_pad("", 2000, " ", STR_PAD_LEFT); // Descripcion
-                    $cadena .= "5"; // Indicador backorder del movimiento
+                    $codPrepack = $this->obtenerCodigoPrepackSiesa('1', $prepack);
+                    if (!empty($codPrepack)) {
+                        $codProductoPrepack = $codPrepack[0]['codigo_prepack'];
+                        $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
+                        $cadena .= '0431'; // Tipo de registro
+                        $cadena .= '0003'; // Subtipo de registro - Version del tipo de registro
+                        $cadena .= '001'; //compañia
+                        $cadena .= $pedido['centro_operacion']; //Centro de operacion
+                        $cadena .= $pedido['tipo_documento']; //Tipo de documento
+                        $cadena .= str_pad($pedido['numero_pedido'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
+                        $cadena .= "0005214"; //0002432 Item
+                        $cadena .= str_pad("", 50, " ", STR_PAD_LEFT); // Referencia item
+                        $cadena .= str_pad("", 20, " ", STR_PAD_LEFT); // Codigo de barras
+                        $cadena .= str_pad($codProductoPrepack, 20, " ", STR_PAD_RIGHT); // Código del paquete
+                        $cadena .= $pedido['bodega']; // Bodega
+                        $cadena .= "501"; // Concepto
+                        $cadena .= "01"; // Motivo
+                        $cadena .= $pedido['centro_operacion']; // Centro de operación movimiento
+                        $cadena .= str_pad("99", 20, " ", STR_PAD_RIGHT); // Unidad de negocio movimiento
+                        $cadena .= str_pad("", 15, " ", STR_PAD_LEFT); // Centro de costo movimiento
+                        $cadena .= str_pad("", 15, " ", STR_PAD_LEFT); // Proyecto
+                        $cadena .= substr($pedido['fecha_pedido'], 0, 4) . substr($pedido['fecha_pedido'], 5, 2) . substr($pedido['fecha_pedido'], 8, 2); // Fecha entrega del pedido
+                        $cadena .= "000"; // Nro. dias de entrega del documento
+                        $cadena .= str_pad($listaPrecio, 3, " ", STR_PAD_RIGHT); // Lista de precio
+                        $cadena .= str_pad(intval($detallePedido['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
+                        $cadena .= str_pad("", 255, " ", STR_PAD_LEFT); // Notas
+                        $cadena .= str_pad("", 2000, " ", STR_PAD_LEFT); // Descripcion
+                        $cadena .= "5"; // Indicador backorder del movimiento
+                        $cadena .= "\n";
+                        $contador++;
+                    } else {
+                        $error = 'El siguiente prepack en el pedido relacionado no existe ' . $prepack;
+                        $estado = "3";
+                        $importar = false;
+                        $this->logErrorImportarPedido($error, $estado, $pedido['centro_operacion'], $pedido['bodega'], $pedido['tipo_documento'], $pedido['numero_pedido']);
+                    }
                 } else {
+                    $productoSiesa = $this->obtenerCodigoProductoSiesa($detallePedido['codigo_producto']);
+                    
                     if (!empty($productoSiesa)) {
-                        $productoSiesa = $this->obtenerCodigoProductoSiesa($detallePedido['codigo_producto']);
                         $codigoProductoSiesa = $productoSiesa[0]['codigo_producto'];
 
                         $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
@@ -230,7 +242,7 @@ class PedidoCore
     public function validarCodPrepack($productoEcom)
     {
         $resp = strpos($productoEcom, 'CO');
-
+        
         if ($resp === 0 ) {
             return true;
         } else {
@@ -244,6 +256,15 @@ class PedidoCore
             ['PARAMETRO1' => $productoEcom],
         ];
         return $this->getWebServiceSiesa(34)->ejecutarConsulta($parametros);
+    }
+
+    public function obtenerCodigoPrepackSiesa($idCia, $prepackEcom)
+    {
+        $parametros = [
+            ['PARAMETRO1' => $idCia],
+            ['PARAMETRO2' => $prepackEcom],
+        ];
+        return $this->getWebServiceSiesa(38)->ejecutarConsulta($parametros);
     }
 
     public function getWebServiceSiesa($idConexion)
