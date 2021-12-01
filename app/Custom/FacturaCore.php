@@ -6,8 +6,9 @@ use App\Custom\WebServiceSiesa;
 use App\Models\ConexionesModel;
 use App\Models\LogErrorImportacionModel;
 use App\Traits\TraitHerramientas;
-use Illuminate\Support\Facades\Storage as FacadesStorage;
-use Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use App\Custom\PedidoCore;
 
 
 class FacturaCore
@@ -39,12 +40,12 @@ class FacturaCore
                 $cadena .= '520'; //Clase interna del documento
                 $cadena .= '1'; //Estado del documento
                 $cadena .= '0'; //Estado de impresión del documento
-                $cadena .= $factura['sucursal_cliente']; //Sucursal cliente a facturar
+                $cadena .= str_pad($factura['sucursal_cliente'], 3, "0", STR_PAD_LEFT); //Sucursal cliente a facturar
                 $cadena .= '0001'; //Tipo de cliente
                 $cadena .= $factura['centro_operacion']; //Centro de operacion de la factura
                 $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Cliente de contado
                 $cadena .= str_pad($factura['nit'], 15, " ", STR_PAD_RIGHT); //Tercero cliente a remisionar
-                $cadena .= $factura['sucursal_cliente'];//Sucursal cliente a remisionar
+                $cadena .= str_pad($factura['sucursal_cliente'], 3, "0", STR_PAD_LEFT);//Sucursal cliente a remisionar
                 $cadena .= str_pad($factura['cedula_vendedor'], 15, " ", STR_PAD_RIGHT);//Tercero vendedor
                 $cadena .= str_pad($factura['numero_factura'], 10, "0", STR_PAD_LEFT); //Referencia del documento
                 $cadena .= str_pad('', 12, " ", STR_PAD_RIGHT); //Numero orden de compra
@@ -127,64 +128,78 @@ class FacturaCore
                 $cadena .= str_pad($factura['numero_documento_remision'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= "\n";
 
-
                 //Creacion Detalle factura - movimientos factura (Movimientos versión 01)
                 $contador = 5;
                 $contadorDetalleFactura = 1;
                 foreach ($detallesFactura as $key => $detalleFactura) {
                     //---Declarando variables
                     $listaPrecio = $detalleFactura['lista_precio'];
-                    
-                    $productoSiesa = $this->obtenerCodigoProductoSiesa($detalleFactura['codigo_producto']);
-            
-                    if (!empty($productoSiesa)) {
-                        $codigoProductoSiesa = $productoSiesa[0]['codigo_producto'];
-                                            
-                        $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
-                        $cadena .= '0470'; //Tipo registro
-                        $cadena .= '01'; //Subtipo registro
-                        $cadena .= '01'; //Version del tipo de registro
-                        $cadena .= '001'; //compañia
-                        $cadena .= $factura['centro_operacion']; //Centro de operacion
-                        $cadena .= $factura['tipo_documento']; //Tipo de documento
-                        $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
-                        $cadena .= str_pad($contadorDetalleFactura, 10, "0", STR_PAD_LEFT); //Numero de registro
-                        $cadena .= str_pad($codigoProductoSiesa, 7, "0", STR_PAD_LEFT); //Item
-                        $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Referencia item
-                        $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Codigo de barras
-                        $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Extencion 1
-                        $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Extencion 2
-                        $cadena .= $factura['bodega']; //Bodega
-                        $cadena .= str_pad('GENERAL', 10, " ", STR_PAD_RIGHT);//Ubicacion
-                        $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Lote
-                        $cadena .= '501'; //Concepto  ----> Ojo: cuando nos definan el tipo de documento para devolucion colocar condicional
-                        $cadena .= '01'; //Motivo
-                        $cadena .= '0'; //Indicador de obsequio
-                        $cadena .= $factura['centro_operacion']; //Centro de operacion movimiento
-                        $cadena .= '01'; //Unidad de negocio movimiento
-                        $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Centro de costo movimiento
-                        $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Proyecto
-                        $cadena .= str_pad($listaPrecio, 3, " ", STR_PAD_RIGHT) ; //Lista de precio
-                        $cadena .= 'UNID'; //Unidad de medida precio
-                        $cadena .= 'UNID'; //Unidad de medida del movimiento
-                        $cadena .= str_pad(intval($detalleFactura['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
-                        $cadena .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
-                        $cadena .= str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT) > '0' ? str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT). '.0000' : str_pad('1', 15, "0", STR_PAD_LEFT) . '.0000'; //Valor bruto
-                        $cadena .= '2'; //Naturaleza de la transaccion
-                        $cadena .= '0'; //Solo valor
-                        $cadena .= '0'; //Impuestos asumidos
-                        $cadena .= str_pad('', 255, " ", STR_PAD_LEFT); //Notas
-                        $cadena .= str_pad('', 2000, " ", STR_PAD_LEFT); //Descripcion
-                        $cadena .= str_pad('', 40, " ", STR_PAD_LEFT); //Descripcion item
-                        $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Unidad de medida de inventario del item.
-                        $cadena .= "\n";
-                        $contador++;
-                        $contadorDetalleFactura++;
+                    $objValidprepack = new PedidoCore();
+                    $validprepack = $objValidprepack->validarCodPrepack($detalleFactura['codigo_producto']);
+                    $prepack = ($validprepack === true) ? $detalleFactura['codigo_producto'] : '';
+                    if (!empty($prepack)) {
+                        $codPrepack = $objValidprepack->obtenerCodigoPrepackSiesa('1', $prepack);
+                        if (!empty($codPrepack)) {
+                            # code...
+                        } else {
+                            $error = 'El siguiente prepack en la factura relacionada no existe ' . $codPrepack;
+                            $estado = "3";
+                            $importar = false;
+                            $this->logErrorImportarFactura($error, $estado, $factura['centro_operacion'], $factura['bodega'], $factura['tipo_documento'], $factura['numero_factura']);
+                        }
+                        // Realizar codigo cadena prepack para factura
                     } else {
-                        $error = 'El siguiente producto en la factura relacionada no existe '.$detalleFactura['codigo_producto'];
-                        $estado = "3";
-                        $importar = false;
-                        $this->logErrorImportarFactura($error, $estado, $factura['centro_operacion'], $factura['bodega'], $factura['tipo_documento'], $factura['numero_factura']);
+                        $productoSiesa = $this->obtenerCodigoProductoSiesa($detalleFactura['codigo_producto']);
+            
+                        if (!empty($productoSiesa)) {
+                            $codigoProductoSiesa = $productoSiesa[0]['codigo_producto'];
+                                            
+                            $cadena .= str_pad($contador, 7, "0", STR_PAD_LEFT); //Numero consecutivo
+                            $cadena .= '0470'; //Tipo registro
+                            $cadena .= '01'; //Subtipo registro
+                            $cadena .= '01'; //Version del tipo de registro
+                            $cadena .= '001'; //compañia
+                            $cadena .= $factura['centro_operacion']; //Centro de operacion
+                            $cadena .= $factura['tipo_documento']; //Tipo de documento
+                            $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
+                            $cadena .= str_pad($contadorDetalleFactura, 10, "0", STR_PAD_LEFT); //Numero de registro
+                            $cadena .= str_pad($codigoProductoSiesa, 7, "0", STR_PAD_LEFT); //Item
+                            $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Referencia item
+                            $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Codigo de barras
+                            $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Extencion 1
+                            $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Extencion 2
+                            $cadena .= $factura['bodega']; //Bodega
+                            $cadena .= str_pad('GENERAL', 10, " ", STR_PAD_RIGHT);//Ubicacion
+                            $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Lote
+                            $cadena .= '501'; //Concepto  ----> Ojo: cuando nos definan el tipo de documento para devolucion colocar condicional
+                            $cadena .= '01'; //Motivo
+                            $cadena .= '0'; //Indicador de obsequio
+                            $cadena .= $factura['centro_operacion']; //Centro de operacion movimiento
+                            $cadena .= '01'; //Unidad de negocio movimiento
+                            $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Centro de costo movimiento
+                            $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Proyecto
+                            $cadena .= str_pad($listaPrecio, 3, " ", STR_PAD_RIGHT) ; //Lista de precio
+                            $cadena .= 'UNID'; //Unidad de medida precio
+                            $cadena .= 'UNID'; //Unidad de medida del movimiento
+                            $cadena .= str_pad(intval($detalleFactura['cantidad']), 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad base
+                            $cadena .= str_pad('', 15, "0", STR_PAD_LEFT) . '.0000'; //Cantidad adicional
+                            $cadena .= str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT) > '0' ? str_pad(intval($detalleFactura['valor_bruto']), 15, "0", STR_PAD_LEFT). '.0000' : str_pad('1', 15, "0", STR_PAD_LEFT) . '.0000'; //Valor bruto
+                            $cadena .= '2'; //Naturaleza de la transaccion
+                            $cadena .= '0'; //Solo valor
+                            $cadena .= '0'; //Impuestos asumidos
+                            $cadena .= str_pad('', 255, " ", STR_PAD_LEFT); //Notas
+                            $cadena .= str_pad('', 2000, " ", STR_PAD_LEFT); //Descripcion
+                            $cadena .= str_pad('', 40, " ", STR_PAD_LEFT); //Descripcion item
+                            $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Unidad de medida de inventario del item.
+                            $cadena .= "\n";
+                            $contador++;
+                            $contadorDetalleFactura++;
+                        } else {
+                            $error = 'El siguiente producto en la factura relacionada no existe '.$detalleFactura['codigo_producto'];
+                            $estado = "3";
+                            $importar = false;
+                            $this->logErrorImportarFactura($error, $estado, $factura['centro_operacion'], $factura['bodega'], $factura['tipo_documento'], $factura['numero_factura']);
+                        }
                     }
                 }
             } else {
@@ -319,7 +334,7 @@ class FacturaCore
             $lineas = explode("\n", $cadena);
 
             $nombreArchivo = $factura['tipo_documento'] . str_pad($factura['numero_factura'], 12, "0", STR_PAD_LEFT) . '.txt';
-            FacadesStorage::disk('local')->put('pandapan/facturas/txt/' . $nombreArchivo, $cadena);
+            Storage::disk('local')->put('pandapan/facturas/txt/' . $nombreArchivo, $cadena);
             $xmlFactura = $this->crearXmlFactura($lineas, $factura['numero_factura'], $factura['tipo_documento']);
 
             if (!$this->existeFacturaSiesa('1', $factura['tipo_documento'], $factura['numero_factura']) && $importar == true) {
@@ -422,7 +437,7 @@ class FacturaCore
         </Importar>";
 
         $nombreArchivo = $tipDoc . str_pad($idOrder, 12, "0", STR_PAD_LEFT) . '.xml';
-        FacadesStorage::disk('local')->put('pandapan/facturas/xml/' . $nombreArchivo, $xmlFactura);
+        Storage::disk('local')->put('pandapan/facturas/xml/' . $nombreArchivo, $xmlFactura);
 
         return $datos;
     }
