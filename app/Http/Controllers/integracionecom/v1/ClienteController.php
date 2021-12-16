@@ -9,9 +9,9 @@ use App\Models\ConexionesModel;
 use App\Models\BodegasTiposDocModel;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Log;
-use Storage;
-use Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class ClienteController extends Controller
 {
@@ -230,7 +230,7 @@ class ClienteController extends Controller
         $cadena .= '0'; //Indica si remplaza la información del tercero cuando este ya existe --> se deja en cero porque debe respetar la información de siesa
         $cadena .= str_pad($data['nit'], 15, " ", STR_PAD_RIGHT); //Código del cliente
         
-        $cadena .= str_pad($data['sucursal'], 3, " ", STR_PAD_RIGHT); //Sucursal del cliente
+        $cadena .= str_pad($data['sucursal'], 3, "0", STR_PAD_RIGHT); //Sucursal del cliente
         $cadena .= '1'; //Estado del cliente
         $cadena .= str_pad($data['nombre_contacto'], 40, " ", STR_PAD_RIGHT); //Razón social del cliente
         $cadena .= 'COP'; //Moneda
