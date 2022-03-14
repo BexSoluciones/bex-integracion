@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\integracionecom\v1;
+namespace App\Http\Controllers\integracionjuandhoyos\v1;
 
 use App\Custom\WebServiceSiesa;
 use App\Http\Controllers\Controller;
@@ -8,9 +8,9 @@ use App\Models\BodegasTiposDocModel;
 use App\Models\ConexionesModel;
 use App\Traits\TraitHerramientas;
 use Illuminate\Http\Request;
-use Log;
-use Storage;
-use Validator;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class PedidoController extends Controller
 {

@@ -43,7 +43,7 @@ Route::get('email/verify', 'Auth\VerificationController@show')->name('verificati
 Route::get('email/verify/{id}/{hash}', 'Auth\VerificationController@verify')->name('verification.verify');
 Route::post('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
 
-Route::get('/reenviopedido', 'integracionecomweb\ReenvioPedidoController@index')->name('reenviopedido');
-Route::get('/reenviofacturas', 'integracionecomweb\ReenvioPedidoController@indexfac')->name('reenviofacturas');
-Route::get('/reenviar-pedido', 'integracionecomweb\ReenvioPedidoController@reenviarPedido')->name('reenviar-pedido');
-Route::get('/reenviar-factura', 'integracionecomweb\ReenvioPedidoController@reenviarFactura')->name('reenviar-factura');
+Route::get('/reenviopedido', 'integracionjuandhoyosweb\ReenvioPedidoController@index')->name('reenviopedido');
+Route::get('/reenviofacturas', 'integracionjuandhoyosweb\ReenvioPedidoController@indexfac')->name('reenviofacturas');
+Route::get('/reenviar-pedido', 'integracionjuandhoyosweb\ReenvioPedidoController@reenviarPedido')->name('reenviar-pedido');
+Route::get('/reenviar-factura', 'integracionjuandhoyosweb\ReenvioPedidoController@reenviarFactura')->name('reenviar-factura');

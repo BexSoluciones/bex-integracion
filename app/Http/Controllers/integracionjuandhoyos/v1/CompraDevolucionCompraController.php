@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\integracionecom\v1;
+namespace App\Http\Controllers\integracionjuandhoyos\v1;
 
 use App\Custom\WebServiceSiesa;
 use App\Http\Controllers\Controller;
@@ -8,7 +8,7 @@ use App\Models\ConexionesModel;
 use App\Traits\TraitHerramientas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class CompraDevolucionCompraController extends Controller
 {
@@ -24,8 +24,6 @@ class CompraDevolucionCompraController extends Controller
 
     public function getComprasDevolucionesCompra(Request $request)
     {
-
-        
         //---------valida filtros en caso de que existan
         $filtros = $request->input('filter');
         $erroresValidacionFiltro = $this->validarFiltros($filtros);
@@ -38,6 +36,7 @@ class CompraDevolucionCompraController extends Controller
         }
 
         //---------Se declaran variables y se valida si se pagina o no
+        
         Log::info($request->all());
         $idConexion = 29; //id conexion get compras y devoluciones de compra
         $idConexionConteo = 31; //conteo get compras y devoluciones
@@ -108,9 +107,6 @@ class CompraDevolucionCompraController extends Controller
                     'errors' => 'No se encontraron registros'
                 ], 404);
             }
-
-
-            
         // }
 
         return response()->json($respuesta, 200);
@@ -295,9 +291,6 @@ class CompraDevolucionCompraController extends Controller
                     $operador = $paramExplode[0];                      
                     
                 }
-                
-                
-
                 
                 switch ($filtro) {
                     case 'tipo_doc':

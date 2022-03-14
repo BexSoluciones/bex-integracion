@@ -29,16 +29,16 @@ Route::group([
       'middleware' => 'auth:api'
     ], function() {
         Route::get('logout', 'Auth\AuthController@logout');
-        Route::get('integracionecom/v1/pedidos', 'integracionecom\v1\PedidoController@getPedidoSiesa');
-        //Route::post('integracionecom/v1/pedidos', 'integracionecom\v1\PedidoController@subirPedidoSiesa'); 
-        Route::post('integracionecom/v1/pedidos', 'integracionecom\v1\IngresoPedidoController@recibirPedidoJson');
+        Route::get('integracionjuandhoyos/v1/pedidos', 'integracionjuandhoyos\v1\PedidoController@getPedidoSiesa');
+        //Route::post('integracionjuandhoyos/v1/pedidos', 'integracionjuandhoyos\v1\PedidoController@subirPedidoSiesa'); 
+        Route::post('integracionjuandhoyos/v1/pedidos', 'integracionjuandhoyos\v1\IngresoPedidoController@recibirPedidoJson');
         
-        Route::get('integracionecom/v1/log-pedidos', 'integracionecom\v1\LogPedidoController@getLogPedido');
-        Route::get('integracionecom/v1/compras-devolucion-compras', 'integracionecom\v1\CompraDevolucionCompraController@getComprasDevolucionesCompra');
-        Route::get('integracionecom/v1/inventarios', 'integracionecom\v1\InventarioController@getInventario');
-        Route::post('integracionecom/v1/clientes', 'integracionecom\v1\ClienteController@saveCliente');
-        // Route::post('integracionecom/v1/facturas', 'integracionecom\v1\FacturaController@subirFacturaSiesa');
-        Route::post('integracionecom/v1/facturas', 'integracionecom\v1\IngresoFacturaController@recibirFacturaJson');
+        Route::get('integracionjuandhoyos/v1/log-pedidos', 'integracionjuandhoyos\v1\LogPedidoController@getLogPedido');
+        Route::get('integracionjuandhoyos/v1/compras-devolucion-compras', 'integracionjuandhoyos\v1\CompraDevolucionCompraController@getComprasDevolucionesCompra');
+        Route::get('integracionjuandhoyos/v1/inventarios', 'integracionjuandhoyos\v1\InventarioController@getInventario');
+        Route::post('integracionjuandhoyos/v1/clientes', 'integracionjuandhoyos\v1\ClienteController@saveCliente');
+        // Route::post('integracionjuandhoyos/v1/facturas', 'integracionjuandhoyos\v1\FacturaController@subirFacturaSiesa');
+        Route::post('integracionjuandhoyos/v1/facturas', 'integracionjuandhoyos\v1\IngresoFacturaController@recibirFacturaJson');
 
     });
 });
