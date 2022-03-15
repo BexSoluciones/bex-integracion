@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\integracionecomweb;
+namespace App\Http\Controllers\integracionjuandhoyosweb;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
