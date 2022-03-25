@@ -8,7 +8,7 @@ use App\Models\ConexionesModel;
 use App\Traits\TraitHerramientas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Log;
+use Illuminate\Support\Facades\Log;
 
 class InventarioController extends Controller
 {
