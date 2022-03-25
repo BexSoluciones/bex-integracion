@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\integracionecom\v1;
+namespace App\Http\Controllers\integracionjuandhoyos\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\DetallePedidoModel;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\integracionecom\v1;
+namespace App\Http\Controllers\integracionjuandhoyos\v1;
 
 use App\Custom\WebServiceSiesa;
 use App\Http\Controllers\Controller;
@@ -27,6 +27,7 @@ class InventarioController extends Controller
     public function getInventario(Request $request)
     {
         //---------valida filtros en caso de que existan
+        Log::info($request);
         $filtros = $request->input('filter');
         $erroresValidacionFiltro = $this->validarFiltros($filtros);
 
@@ -283,6 +284,8 @@ class InventarioController extends Controller
 
     public function armarSqlInventario($filtros, $paginar, $paramPaginacion)
     {
+        Log::info($paramPaginacion);
+        die();
         $cadenaWhere = '';
         if (!empty($filtros)) {
 
