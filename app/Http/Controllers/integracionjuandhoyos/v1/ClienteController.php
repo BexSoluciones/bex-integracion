@@ -199,7 +199,7 @@ class ClienteController extends Controller
 
         $nombreArchivo = str_pad($data['nit'], 15, "0", STR_PAD_LEFT) . '.xml';
         
-        $xml=$this->crearXml('pandapan/terceros/xml/',$nombreArchivo,$lineas);
+        $xml=$this->crearXml('juandhoyos/terceros/xml/',$nombreArchivo,$lineas);
         $respImport=$this->importarXml($xml);
 
         if($respImport['created']===true){
@@ -269,7 +269,7 @@ class ClienteController extends Controller
 
         $nombreArchivo = str_pad($data['nit'], 15, "0", STR_PAD_LEFT) . '.txt';
         
-        $xml=$this->crearXml('pandapan/clientes/xml/',$nombreArchivo,$lineas);
+        $xml=$this->crearXml('juandhoyos/clientes/xml/',$nombreArchivo,$lineas);
         $respImport=$this->importarXml($xml);
 
         
@@ -334,7 +334,7 @@ class ClienteController extends Controller
 
         $nombreArchivo = str_pad($data['nit'], 15, "0", STR_PAD_LEFT) . '.xml';
         
-        $xml=$this->crearXml('pandapan/impuestos_cliente/xml/',$nombreArchivo,$lineas);
+        $xml=$this->crearXml('juandhoyos/impuestos_cliente/xml/',$nombreArchivo,$lineas);
         $respImport=$this->importarXml($xml);
 
         if($respImport['created']===true){
