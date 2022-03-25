@@ -284,8 +284,6 @@ class InventarioController extends Controller
 
     public function armarSqlInventario($filtros, $paginar, $paramPaginacion)
     {
-        Log::info($paramPaginacion);
-        die();
         $cadenaWhere = '';
         if (!empty($filtros)) {
 
