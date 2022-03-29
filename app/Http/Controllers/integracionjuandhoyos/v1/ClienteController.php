@@ -241,7 +241,7 @@ class ClienteController extends Controller
         $cadena .= '+000000000000000.0000';//Cupo de credito
         $cadena .= '0001';//Tipo de cliente
         $cadena .= str_pad('', 4, " ", STR_PAD_RIGHT); //Grupo de descuento
-        $cadena .= str_pad('1', 4, " ", STR_PAD_RIGHT); //Lista de precios
+        $cadena .= str_pad('1', 3, " ", STR_PAD_RIGHT); //Lista de precios
         $cadena .= '0'; //Indicador de backorder
         $cadena .= '9999.99'; //Porcentaje para poder vender por encima de lo pedido
         $cadena .= '0000.00'; //Porcentaje de margen mínimo
