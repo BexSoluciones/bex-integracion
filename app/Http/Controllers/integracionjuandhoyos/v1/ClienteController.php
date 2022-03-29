@@ -119,6 +119,7 @@ class ClienteController extends Controller
             'codigo_ciudad' => 'required|size:5',
             'barrio' => 'required|max:40',
             'telefono' => 'required|max:20',
+            'correo' => 'required'
         ];
 
         if($datos['tipo_identificacion'] =='C'){
@@ -191,7 +192,7 @@ class ClienteController extends Controller
         $cadena .= str_pad($data['telefono'], 20, " ", STR_PAD_RIGHT);//Telefono
         $cadena .= str_pad('', 20, " ", STR_PAD_RIGHT);//Fax
         $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT);//Codigo postal
-        $cadena .= str_pad('factura720@gmail.com', 50, " ", STR_PAD_RIGHT);//Dirección de correo electrónico
+        $cadena .= str_pad($data['correo'], 50, " ", STR_PAD_RIGHT);//Dirección de correo electrónico
         $cadena .= "\n";
         $cadena .= str_pad(3, 7, "0", STR_PAD_LEFT)."99990001001";
 
@@ -229,19 +230,18 @@ class ClienteController extends Controller
         $cadena .= '001'; //Compañia
         $cadena .= '0'; //Indica si remplaza la información del tercero cuando este ya existe --> se deja en cero porque debe respetar la información de siesa
         $cadena .= str_pad($data['nit'], 15, " ", STR_PAD_RIGHT); //Código del cliente
-        
         $cadena .= str_pad($data['sucursal'], 3, "0", STR_PAD_RIGHT); //Sucursal del cliente
         $cadena .= '1'; //Estado del cliente
         $cadena .= str_pad($data['nombre_contacto'], 40, " ", STR_PAD_RIGHT); //Razón social del cliente
         $cadena .= 'COP'; //Moneda
-        $cadena .= str_pad('000', 4, " ", STR_PAD_RIGHT);; //Codigo del vendedor
+        $cadena .= str_pad('1111', 4, " ", STR_PAD_RIGHT);; //Codigo del vendedor
         $cadena .= 'A'; //Clasificacion
-        $cadena .= 'C01'; //Condicion de pago
-        $cadena .= str_pad(2, 3, " ", STR_PAD_LEFT); //Días de gracia
-        $cadena .= '+000000002000000.0000';//Cupo de credito
+        $cadena .= '00D'; //Condicion de pago
+        $cadena .= str_pad(0, 3, " ", STR_PAD_LEFT); //Días de gracia
+        $cadena .= '+000000000000000.0000';//Cupo de credito
         $cadena .= '0001';//Tipo de cliente
         $cadena .= str_pad('', 4, " ", STR_PAD_RIGHT); //Grupo de descuento
-        $cadena .= '001'; //Lista de precios
+        $cadena .= str_pad('1', 4, " ", STR_PAD_RIGHT); //Lista de precios
         $cadena .= '0'; //Indicador de backorder
         $cadena .= '9999.99'; //Porcentaje para poder vender por encima de lo pedido
         $cadena .= '0000.00'; //Porcentaje de margen mínimo
@@ -261,7 +261,7 @@ class ClienteController extends Controller
         $cadena .= str_pad($data['telefono'], 20, " ", STR_PAD_RIGHT); //Telefono
         $cadena .= str_pad('', 20, " ", STR_PAD_RIGHT); //Fax
         $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT); //Codigo postal
-        $cadena .= str_pad('factura720@gmail.com', 50, " ", STR_PAD_RIGHT); //Direccion de correo electrónico
+        $cadena .= str_pad($data['correo'], 50, " ", STR_PAD_RIGHT); //Direccion de correo electrónico
         $cadena .= "\n";
         $cadena .= str_pad(3, 7, "0", STR_PAD_LEFT)."99990001001";
 
