@@ -33,7 +33,7 @@ class FacturaCore
                 $cadena .= '1'; //Indicador para liquidar retenciones
                 $cadena .= '0'; //Indica si el numero consecutivo de docto es manual o automático
                 $cadena .= $factura['centro_operacion']; //Centro de operación del documento
-                $cadena .= $factura['tipo_documento']; //Tipo de documento
+                $cadena .= str_pad($factura['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
                 $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= substr($factura['fecha_factura'], 0, 4).substr($factura['fecha_factura'], 5, 2).substr($factura['fecha_factura'], 8, 2); //Fecha del documento
                 $cadena .= str_pad($factura['nit'], 15, " ", STR_PAD_RIGHT); //Tercero cliente a facturar

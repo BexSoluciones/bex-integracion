@@ -34,7 +34,7 @@ class PedidoCore
             $cadena .= '0'; //Indica si el numero consecutivo de docto es manual o automático
             $cadena .= '1'; //Indicador de contacto
             $cadena .= $pedido['centro_operacion']; //Centro de operación del documento
-            $cadena .= $pedido['tipo_documento']; //Tipo de documento
+            $cadena .= str_pad($pedido['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
             $cadena .= str_pad($pedido['numero_pedido'], 8, "0", STR_PAD_LEFT); //Numero documento
             $cadena .= substr($pedido['fecha_pedido'], 0, 4) . substr($pedido['fecha_pedido'], 5, 2) . substr($pedido['fecha_pedido'], 8, 2); //Fecha del documento
             $cadena .= '502'; //Clase interna del documento
