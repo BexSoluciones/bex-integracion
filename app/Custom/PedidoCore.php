@@ -99,7 +99,7 @@ class PedidoCore
                         $cadena .= '0003'; // Subtipo de registro - Version del tipo de registro
                         $cadena .= '001'; //compañia
                         $cadena .= $pedido['centro_operacion']; //Centro de operacion
-                        $cadena .= $pedido['tipo_documento']; //Tipo de documento
+                        $cadena .= str_pad($pedido['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
                         $cadena .= str_pad($pedido['numero_pedido'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
                         $cadena .= "0005214"; //0002432 Item
                         $cadena .= str_pad("", 50, " ", STR_PAD_LEFT); // Referencia item
@@ -139,7 +139,7 @@ class PedidoCore
                         $cadena .= '02'; //Version del tipo de registro
                         $cadena .= '001'; //compañia
                         $cadena .= $pedido['centro_operacion']; //Centro de operacion
-                        $cadena .= $pedido['tipo_documento']; //Tipo de documento
+                        $cadena .= str_pad($pedido['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
                         $cadena .= str_pad($pedido['numero_pedido'], 8, "0", STR_PAD_LEFT); //Consecutivo de documento
                         $cadena .= str_pad($contadorDetallePedido, 10, "0", STR_PAD_LEFT); //Numero de registro --> hacer contador
                         $cadena .= str_pad($codigoProductoSiesa, 7, "0", STR_PAD_LEFT); //Item

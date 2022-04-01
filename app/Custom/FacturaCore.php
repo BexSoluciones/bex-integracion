@@ -21,7 +21,7 @@ class FacturaCore
             $importar = true;
             $cadena = "";
             $cadena .= str_pad(1, 7, "0", STR_PAD_LEFT) . "00000001001\n"; // Linea 1
-            if ($factura['tipo_documento'] == 'EUM' || $factura['tipo_documento'] == 'EUP' || $factura['tipo_documento'] == 'EUC' || $factura['tipo_documento'] == 'EUV') {
+            if ($factura['tipo_documento'] == 'FEV') {
                 
                 // Crear estructura para VENTA (Docto. ventas comercial v1)
                 $cadena .= str_pad(2, 7, "0", STR_PAD_LEFT); //Numero de registros
@@ -100,7 +100,7 @@ class FacturaCore
                 $cadena .= '01'; //version del tipo de registro
                 $cadena .= '001'; //Compañia
                 $cadena .= '001'; //Centro de operación del documento
-                $cadena .= $factura['tipo_documento']; //Tipo de documento
+                $cadena .= str_pad($factura['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
                 $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= str_pad('', 3, " ", STR_PAD_LEFT); //Tipo documento de cruce
                 $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero de documento de cruce
@@ -121,10 +121,10 @@ class FacturaCore
                 $cadena .= '01'; //version del tipo de registro
                 $cadena .= '001'; //Compañia
                 $cadena .= '001'; //Centro de operación del documento
-                $cadena .= $factura['tipo_documento']; //Tipo de documento
+                $cadena .= str_pad($factura['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
                 $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= '001'; //Centro de operación del documento
-                $cadena .= $factura['tipo_documento_remision']; //Tipo de documento remision
+                $cadena .= str_pad($factura['tipo_documento_remision'], 3, " ", STR_PAD_RIGHT); //Tipo de documento remision
                 $cadena .= str_pad($factura['numero_documento_remision'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= "\n";
 
@@ -212,12 +212,12 @@ class FacturaCore
                 $cadena .= '001'; //Compañia
                 $cadena .= '0'; //Indica si el numero consecutivo de docto es manual o automático
                 $cadena .= $factura['centro_operacion']; //Centro de operación del documento
-                $cadena .= $factura['tipo_documento']; //Tipo de documento
+                $cadena .= str_pad($factura['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
                 $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= substr($factura['fecha_factura'], 0, 4).substr($factura['fecha_factura'], 5, 2).substr($factura['fecha_factura'], 8, 2); //Fecha del documento
                 $cadena .= '1'; //Estado del documento
                 $cadena .= '0'; //Estado de impresión del documento
-                $cadena .= $factura['tipo_documento_remision']; // Tipo de documento A DEVOLVER
+                $cadena .= str_pad($factura['tipo_documento_remision'], 3, " ", STR_PAD_RIGHT); // Tipo de documento A DEVOLVER
                 $cadena .= $factura['numero_documento_remision']; // Numero de documento A DEVOLVER
                 $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT); //Codigo de vehiculo
                 $cadena .= str_pad('', 15, " ", STR_PAD_RIGHT); //Codigo transportador
@@ -241,7 +241,7 @@ class FacturaCore
                 $cadena .= '01'; //version del tipo de registro
                 $cadena .= '001'; //Compañia
                 $cadena .= '001'; //Centro de operación del documento
-                $cadena .= $factura['tipo_documento']; //Tipo de documento
+                $cadena .= str_pad($factura['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
                 $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= str_pad('', 3, " ", STR_PAD_LEFT); //Tipo documento de cruce
                 $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero de documento de cruce
@@ -262,10 +262,10 @@ class FacturaCore
                 $cadena .= '01'; //version del tipo de registro
                 $cadena .= '001'; //Compañia
                 $cadena .= '001'; //Centro de operación del documento
-                $cadena .= $factura['tipo_documento']; //Tipo de documento
+                $cadena .= str_pad($factura['tipo_documento'], 3, " ", STR_PAD_RIGHT); //Tipo de documento
                 $cadena .= str_pad($factura['numero_factura'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= '001'; //Centro de operación del documento
-                $cadena .= $factura['tipo_documento_remision']; //Tipo de documento remision
+                $cadena .= str_pad($factura['tipo_documento_remision'], 3, " ", STR_PAD_RIGHT); //Tipo de documento remision
                 $cadena .= str_pad($factura['numero_documento_remision'], 8, "0", STR_PAD_LEFT); //Numero documento
                 $cadena .= "\n";
 
