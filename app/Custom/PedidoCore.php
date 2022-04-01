@@ -105,7 +105,7 @@ class PedidoCore
                         $cadena .= str_pad("", 50, " ", STR_PAD_LEFT); // Referencia item
                         $cadena .= str_pad("", 20, " ", STR_PAD_LEFT); // Codigo de barras
                         $cadena .= str_pad($codProductoPrepack, 20, " ", STR_PAD_RIGHT); // Código del paquete
-                        $cadena .= $pedido['bodega']; // Bodega
+                        $cadena .= str_pad($pedido['bodega'], 5, " ", STR_PAD_RIGHT); // Bodega
                         $cadena .= "501"; // Concepto
                         $cadena .= "01"; // Motivo
                         $cadena .= $pedido['centro_operacion']; // Centro de operación movimiento
@@ -147,7 +147,7 @@ class PedidoCore
                         $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Codigo de barras
                         $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 1
                         $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 2
-                        $cadena .= $pedido['bodega']; //Bodega
+                        $cadena .= str_pad($pedido['bodega'], 5, " ", STR_PAD_RIGHT); //Bodega
                         $cadena .= '501'; //Concepto
                         $cadena .= '01'; //Motivo
                         $cadena .= '0'; //Indicador de obsequio
