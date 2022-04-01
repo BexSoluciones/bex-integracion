@@ -10,7 +10,7 @@ use App\Jobs\ProcessSubirFacturaSiesa;
 
 class SubirFacturaCommand extends Command
 {
-    protected $signature = 'ecom:subir-factura';
+    protected $signature = 'juandhoyos:subir-factura';
 
     protected $description = 'sube facturas';
 
