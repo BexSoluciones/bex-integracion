@@ -334,7 +334,7 @@ class FacturaCore
             $lineas = explode("\n", $cadena);
 
             $nombreArchivo = $factura['tipo_documento'] . str_pad($factura['numero_factura'], 12, "0", STR_PAD_LEFT) . '.txt';
-            Storage::disk('local')->put('pandapan/facturas/txt/' . $nombreArchivo, $cadena);
+            Storage::disk('local')->put('juandhoyos/facturas/txt/' . $nombreArchivo, $cadena);
             $xmlFactura = $this->crearXmlFactura($lineas, $factura['numero_factura'], $factura['tipo_documento']);
 
             if (!$this->existeFacturaSiesa('1', $factura['tipo_documento'], $factura['numero_factura']) && $importar == true) {
@@ -437,7 +437,7 @@ class FacturaCore
         </Importar>";
 
         $nombreArchivo = $tipDoc . str_pad($idOrder, 12, "0", STR_PAD_LEFT) . '.xml';
-        Storage::disk('local')->put('pandapan/facturas/xml/' . $nombreArchivo, $xmlFactura);
+        Storage::disk('local')->put('juandhoyos/facturas/xml/' . $nombreArchivo, $xmlFactura);
 
         return $datos;
     }

@@ -183,7 +183,7 @@ class PedidoCore
             $lineas = explode("\n", $cadena);
 
             $nombreArchivo = str_pad($pedido['numero_pedido'], 15, "0", STR_PAD_LEFT) . '.txt';
-            Storage::disk('local')->put('pandapan/pedidos_txt/' . $nombreArchivo, $cadena);
+            Storage::disk('local')->put('juandhoyos/pedidos_txt/' . $nombreArchivo, $cadena);
             $xmlPedido = $this->crearXmlPedido($lineas, $pedido['numero_pedido']);
 
             if (!$this->existePedidoSiesa('1', $pedido['tipo_documento'], str_pad($pedido['numero_pedido'], 15, "Y", STR_PAD_LEFT)) && $importar === true) {
@@ -312,7 +312,7 @@ class PedidoCore
         </Importar>";
 
         $nombreArchivo = str_pad($idOrder, 15, "Y", STR_PAD_LEFT) . '.xml';
-        Storage::disk('local')->put('pandapan/pedidos/' . $nombreArchivo, $xmlPedido);
+        Storage::disk('local')->put('juandhoyos/pedidos/' . $nombreArchivo, $xmlPedido);
 
         return $datos;
     }
