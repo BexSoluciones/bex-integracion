@@ -50,7 +50,7 @@ class FacturaCore
                 $cadena .= str_pad($factura['numero_factura'], 10, "0", STR_PAD_LEFT); //Referencia del documento
                 $cadena .= str_pad('', 12, " ", STR_PAD_RIGHT); //Numero orden de compra
                 $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT); //Numero de cargue
-                $cadena .= 'C01'; //Condicion de pago
+                $cadena .= '00D'; //Condicion de pago
                 $cadena .= 'COP'; //Moneda documento
                 $cadena .= 'COP'; //Moneda base de conversión
                 $cadena .= '00000001.0000'; //Tasa de conversión

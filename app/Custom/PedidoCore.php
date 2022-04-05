@@ -50,13 +50,13 @@ class PedidoCore
             $cadena .= '000'; //Nro. dias de entrega del documento
             $cadena .= str_pad($pedido['numero_pedido'], 15, "Y", STR_PAD_LEFT); //Orden de compra del Documento
             $cadena .= str_pad($pedido['numero_pedido'], 10, "0", STR_PAD_LEFT); //Referencia del documento
-            $cadena .= str_pad('GENERICO', 10, " ", STR_PAD_RIGHT); //Codigo de cargue del documento
+            $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT); //Codigo de cargue del documento
             $cadena .= 'COP'; //Codigo de moneda del documento
             $cadena .= 'COP'; //Moneda base de conversión
             $cadena .= '00000001.0000'; //Tasa de conversión
             $cadena .= 'COP'; //Moneda local
             $cadena .= '00000001.0000'; //Tasa local
-            $cadena .= 'C01'; //Condicion de pago
+            $cadena .= '00D'; //Condicion de pago
             $cadena .= '0'; //Estado de impresión del documento
             $cadena .= str_pad($this->quitarSaltosLinea($this->sanear_string($pedido['observaciones_pedido'] . "//------Vendedor:" . $pedido['vendedor'] . "")), 2000, " ", STR_PAD_RIGHT); //Observaciones del documento
             $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //cliente de contado
