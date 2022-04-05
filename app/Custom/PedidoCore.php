@@ -107,7 +107,7 @@ class PedidoCore
                         $cadena .= str_pad($codProductoPrepack, 20, " ", STR_PAD_RIGHT); // Código del paquete
                         $cadena .= str_pad($pedido['bodega'], 5, " ", STR_PAD_RIGHT); // Bodega
                         $cadena .= "501"; // Concepto
-                        $cadena .= "01"; // Motivo
+                        $cadena .= "1 "; // Motivo
                         $cadena .= $pedido['centro_operacion']; // Centro de operación movimiento
                         $cadena .= str_pad("99", 20, " ", STR_PAD_RIGHT); // Unidad de negocio movimiento
                         $cadena .= str_pad("", 15, " ", STR_PAD_LEFT); // Centro de costo movimiento
