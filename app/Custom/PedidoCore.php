@@ -149,7 +149,7 @@ class PedidoCore
                         $cadena .= str_pad('', 20, " ", STR_PAD_LEFT); //Extencion 2
                         $cadena .= str_pad($pedido['bodega'], 5, " ", STR_PAD_RIGHT); //Bodega
                         $cadena .= '501'; //Concepto
-                        $cadena .= '01'; //Motivo
+                        $cadena .= '1 '; //Motivo
                         $cadena .= '0'; //Indicador de obsequio
                         $cadena .= $pedido['centro_operacion']; //Centro de operacion movimiento
                         $cadena .= str_pad('01', 20, " ", STR_PAD_RIGHT); //Unidad de negocio movimiento
