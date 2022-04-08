@@ -180,7 +180,7 @@ class IngresoFacturaController extends Controller
             'valor_medio_pago' => 'required|regex:/^[0-9]+(\.[0-9]{1,4})?$/',
             'tipo_documento_remision' => 'required',
             'numero_documento_remision' => 'required',
-            'bodega' => 'required|digits_between:1,6',
+            'bodega' => 'required',
             'centro_operacion' => 'required|digits_between:1,3',
             'observaciones_factura' => 'max:2000',
         ];
