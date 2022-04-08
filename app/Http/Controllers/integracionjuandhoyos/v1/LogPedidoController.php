@@ -4,13 +4,13 @@ namespace App\Http\Controllers\integracionjuandhoyos\v1;
 
 use App\Http\Controllers\Controller;
 use App\Models\LogErrorImportacionModel;
-use Log;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 class LogPedidoController extends Controller
 {
     
-    public function getLogPedido(Request $request){
+    public function getLogPedido(Request $request){ 
         $filtros = $request->input('filter');
         Log::info($filtros);
         $erroresValidacionFiltro = $this->validarFiltros($filtros);

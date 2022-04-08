@@ -164,6 +164,7 @@ class IngresoFacturaController extends Controller
     {
         //------Elimino detalle factura el cual no esta dentro de esta validación
         $datosEncFactura = $this->decodificarArray($datosEncFactura);
+        log::info($datosEncFactura);
         $rules = [
             'tipo_documento' => 'required',
             'numero_factura' => 'required',
@@ -179,7 +180,7 @@ class IngresoFacturaController extends Controller
             'valor_medio_pago' => 'required|regex:/^[0-9]+(\.[0-9]{1,4})?$/',
             'tipo_documento_remision' => 'required',
             'numero_documento_remision' => 'required',
-            'bodega' => 'required|digits_between:1,5',
+            'bodega' => 'required|digits_between:1,6',
             'centro_operacion' => 'required|digits_between:1,3',
             'observaciones_factura' => 'max:2000',
         ];
