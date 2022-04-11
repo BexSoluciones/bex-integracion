@@ -169,10 +169,10 @@ class FacturaCore
                             $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Extencion 1
                             $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Extencion 2
                             $cadena .= str_pad($factura['bodega'], 5, " ", STR_PAD_RIGHT); //Bodega
-                            $cadena .= str_pad('GENERAL', 10, " ", STR_PAD_RIGHT);//Ubicacion
+                            $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT);//Ubicacion
                             $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Lote
                             $cadena .= '501'; //Concepto  ----> Ojo: cuando nos definan el tipo de documento para devolucion colocar condicional
-                            $cadena .= '01'; //Motivo
+                            $cadena .= str_pad('1', 2," ",STR_PAD_RIGHT); //Motivo
                             $cadena .= '0'; //Indicador de obsequio
                             $cadena .= $factura['centro_operacion']; //Centro de operacion movimiento
                             $cadena .= '01'; //Unidad de negocio movimiento
@@ -296,10 +296,10 @@ class FacturaCore
                         $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Extencion 1
                         $cadena .= str_pad('', 4, " ", STR_PAD_LEFT); //Extencion 2
                         $cadena .= str_pad($factura['bodega'], 5, " ", STR_PAD_RIGHT); //Bodega
-                        $cadena .= str_pad('GENERAL', 10, " ", STR_PAD_RIGHT);//Ubicacion
+                        $cadena .= str_pad('', 10, " ", STR_PAD_RIGHT);//Ubicacion
                         $cadena .= str_pad('', 15, " ", STR_PAD_LEFT); //Lote
                         $cadena .= '501'; //Concepto  ----> Ojo: cuando nos definan el tipo de documento para devolucion colocar condicional
-                        $cadena .= '01'; //Motivo
+                        $cadena .= str_pad('1', 2," ",STR_PAD_RIGHT); //Motivo
                         $cadena .= '0'; //Indicador de obsequio
                         $cadena .= $factura['centro_operacion']; //Centro de operacion movimiento
                         $cadena .= '01'; //Unidad de negocio movimiento
