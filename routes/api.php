@@ -41,8 +41,10 @@ Route::group([
         Route::post('integracionjuandhoyos/v1/facturas', 'integracionjuandhoyos\v1\IngresoFacturaController@recibirFacturaJson');
         
 
+        Route::post('bexintegracion/v1/clientes', 'bexintegracion\v1\ClienteController@saveCliente');
+
         Route::get('bexintegracion/v1/compras-devolucion-compras', 'bexintegracion\v1\ComprasDevolucionComprasController@getComprasDevolucionCompras');
-        // Route::post('bexintegracion/v1/compras-devolucion-compras', 'bexintegracion\v1\ComprasDevolucionComprasController@getComprasDevolucionCompras');
+        Route::get('bexintegracion/v1/inventarios', 'bexintegracion\v1\InventarioController@getInventario');
 
     });
 });

@@ -3,32 +3,31 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Http;
-
+use Illuminate\Support\Facades\Log;
 
 trait TraitApiWms
 {
-    public function getWmsComprasDevolucioCompras($request)
+    public function getWmsTransacciones($request, $transc)
     {
-        // Log::info($request);
-        // return $request->siesa_url.'consulta_compras';
-        $compra = HTTP::post($request->siesa_url.'consulta_compras',[
+        $transac = HTTP::post($request->siesa_url.$transc,[
             'url_rpc' => $request->siesa_id_consulta,
             'db_rpc' => $request->siesa_conexion,
             'email_rpc' =>  $request->siesa_usuario,
             'token_rpc' =>  $request->siesa_clave,
         ]);
-        $compraArray = $compra->json();
+        return $transac->json();
+    }
 
-        $devCompra = HTTP::post($request->siesa_url.'consulta_ventas',[
+    public function getWmsDevolucioCompras($request)
+    {
+        $devCompra = HTTP::post($request->siesa_url.'consulta_devolucion_mercancia',[
             'url_rpc' => $request->siesa_id_consulta,
             'db_rpc' => $request->siesa_conexion,
             'email_rpc' =>  $request->siesa_usuario,
             'token_rpc' =>  $request->siesa_clave,
         ]);
-        $devcompraArray = $devCompra->json();
-        $compraDevCompraArray = $compraArray + $devcompraArray;
-        // return $compraArray;
-        return $compraDevCompraArray;
+
+        return $devCompra->json();
     }
 
     public function getWmsAccesTokenWms($request)
@@ -56,7 +55,17 @@ trait TraitApiWms
                 }   
             }
                 
-        } 
+        }
         return $access_token;
     }
+
+    public function postWmsCrearClientes($access_token,$conexion,$request)
+    {
+        // Log::info($request);
+        $crearCliente = HTTP::withToken($access_token)->post($conexion, $request);
+
+        return  $crearCliente->json();
+    }
+
+
 }
