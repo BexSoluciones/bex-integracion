@@ -61,11 +61,17 @@ trait TraitApiWms
 
     public function postWmsCrearClientes($access_token,$conexion,$request)
     {
-        // Log::info($request);
-        $crearCliente = HTTP::withToken($access_token)->post($conexion, $request);
-
+        $crearCliente = HTTP::withToken($access_token)->post($conexion.'clientes', $request);
         return  $crearCliente->json();
     }
 
+    public function postWmsCrearPedidos($access_token,$conexion,$request)
+    {
+        // Log::info($access_token);
+        // Log::info($conexion);
+        // Log::info($request);
+        $crearPedidos = HTTP::withToken($access_token)->post($conexion.'creacion_ventas', $request);
 
+        return  $crearPedidos->json();
+    }
 }

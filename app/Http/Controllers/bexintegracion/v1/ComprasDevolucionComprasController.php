@@ -90,7 +90,7 @@ class ComprasDevolucionComprasController extends Controller
                     $nit = $datos['partner_id'];
                     $razonSoc = $datos['partner_id'] = '860002518' ? 'UNILEVER ANDINA COLOMBIA LTDA' : 'PROORIENTE';
                     $suc = $datos['partner_id'] = '860002518' ? '001' : '002';
-                    // $bod = $datos['almacen']; AGREGAR BODEGA EN LA DEVOLUCIÓN
+                    $bod = $datos['almacen'];
                     $data = [
                         'consec_doc' => (string) $datos['name'],
                         'cia' => '1',
@@ -107,22 +107,22 @@ class ComprasDevolucionComprasController extends Controller
 
                     $countDet = '0';
                     foreach ($datos['detalle'] as $keyb => $det) {
-                        // $valTotal = $det['price_unit'] * $det['product_qty'];
-                        // $valorImp =  $valTotal * ($det['taxes_id']/100);
+                        $valTotal = $det['price_unit'] * $det['product_qty'];
+                        $valorImp =  $valTotal * ($det['taxes_id']/100);
 
                         $detalle = [
                             'item' => $det['product_id'],
-                            'Bodega' => 'PROORIENTE: Receipts', // ES MEJOR QUE ME ENVIÉ EL CODIGO DE LA BOD
+                            'Bodega' => $bod,
                             'unid_medida' => 'UNID',
-                            'cantidad' => (string) $det['qty_done'],
-                            // 'costo_prom_unit' => (string) $det['price_unit'],
-                            // 'costo_prom_total' => (string) $valTotal,
-                            // 'precio_unit' => (string) $det['price_unit'],
-                            // 'valor_bruto' => (string) $det['price_unit'],
-                            // 'valor_impuesto' => (string) $valorImp,
-                            // 'valor_neto' => (string) $valTotal,
-                            // 'descuento' => (string) '',
-                            // 'impuesto' => (string) $det['taxes_id'],
+                            'cantidad' => (string) $det['product_qty'],
+                            'costo_prom_unit' => (string) $det['price_unit'],
+                            'costo_prom_total' => (string) $valTotal,
+                            'precio_unit' => (string) $det['price_unit'],
+                            'valor_bruto' => (string) $det['price_unit'],
+                            'valor_impuesto' => (string) $valorImp,
+                            'valor_neto' => (string) $valTotal,
+                            'descuento' => (string) '',
+                            'impuesto' => (string) $det['taxes_id'],
                         ];
                         $arrayDet[$countDet] = $detalle;
                         $countDet++;

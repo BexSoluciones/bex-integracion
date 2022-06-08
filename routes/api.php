@@ -41,6 +41,8 @@ Route::group([
         Route::post('integracionjuandhoyos/v1/facturas', 'integracionjuandhoyos\v1\IngresoFacturaController@recibirFacturaJson');
         
 
+        Route::post('bexintegracion/v1/pedidos', 'bexintegracion\v1\IngresoPedidoController@recibirPedidoJson');
+
         Route::post('bexintegracion/v1/clientes', 'bexintegracion\v1\ClienteController@saveCliente');
 
         Route::get('bexintegracion/v1/compras-devolucion-compras', 'bexintegracion\v1\ComprasDevolucionComprasController@getComprasDevolucionCompras');

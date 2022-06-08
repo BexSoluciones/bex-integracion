@@ -12,9 +12,6 @@ class ClienteCore
     public function crearCliente($data)
     {
         // Log::info($data);
-        $conexionToken = ConexionesModel::where('id_conexion','2')->get()[0];
-        $access_token = $this->getWmsAccesTokenWms($conexionToken);
-        Log::info($access_token);
         $conexion = ConexionesModel::where('id_conexion','3')->get()[0];
 
         $arrayCliente = [
@@ -42,7 +39,16 @@ class ClienteCore
         $collectionClient = collect(['cliente' => $data]);
         Storage::disk('local')->put('/public/clientes/' . $data['nit'].'.json', $collectionClient);
         
-        $crearCliente = $this->postWmsCrearClientes($access_token,$conexion->siesa_url,$arrayCliente); 
+        $crearCliente = $this->postCrearClientes($conexion,$arrayCliente);
+        Log::info($crearCliente);
         return $crearCliente;
+    }
+
+    public function postCrearClientes($conexion,$arrayCliente)
+    {
+        $conexionToken = ConexionesModel::where('id_conexion','2')->get()[0];
+        $access_token = $this->getWmsAccesTokenWms($conexionToken);
+        $response = $this->postWmsCrearClientes($access_token,$conexion->siesa_url,$arrayCliente); 
+        return $response;
     }
 }

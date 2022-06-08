@@ -6,13 +6,12 @@ use Illuminate\Console\Command;
 use App\Models\EncabezadoPedidoModel;
 use App\Models\DetallePedidoModel;
 use App\Jobs\ProcessSubirPedidoSiesa;
-use App\Custom\PedidoCore;
 use Log;
 
 class SubirPedidoCommand extends Command
 {
     
-    protected $signature = 'juandhoyos:subir-pedido';
+    protected $signature = 'comand:subir-pedido {install}';
 
     protected $description = 'sube pedidos';
 
@@ -28,7 +27,7 @@ class SubirPedidoCommand extends Command
             foreach ($pedidos as $key => $pedido) {
                 $objPedidoDetalle = new DetallePedidoModel();
                 $detallePedido = $objPedidoDetalle->obtenerDetallePedido($pedido['numero_pedido'],$pedido['centro_operacion'],$pedido['tipo_documento'],$pedido['bodega']);
-                ProcessSubirPedidoSiesa::dispatch($pedido,$detallePedido);
+                ProcessSubirPedidoSiesa::dispatch($pedido,$detallePedido, $this->argument('install'));
             }
         }
 

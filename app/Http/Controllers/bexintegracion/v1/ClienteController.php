@@ -125,7 +125,7 @@ class ClienteController extends Controller
                 'valid' => true,
                 'errors' => 0,
             ];
-        }       
+        }
 
     }
 }
