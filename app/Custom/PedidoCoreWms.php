@@ -33,16 +33,20 @@ class PedidoCoreWms
                 'partner_id' => (string) $pedido['nit_cliente'],
                 'date_order' => substr($pedido['fecha_pedido'], 0, 10),
             ];
+            $detProd = array();
+            $countDet = 0;
             foreach ($detallesPedido as $key => $detallePedido) {
                 
-                $arrayPedido['detalle'] = array([
+                $detProd[$countDet] = [
                     'product_id' => $detallePedido['codigo_producto'],
                     'product_uom_qty' => $detallePedido['cantidad'],
                     'tax_id' => $detallePedido['IVAMOV'],
                     'price_unit' => $detallePedido['precio_unitario'],
                     'discount' => is_null($detallePedido['DCTO1MOV']) ? '0' : $detallePedido['DCTO1MOV'],
-                ]);
+                ];
+                $countDet++;
             }
+            $arrayPedido['detalle'] = $detProd;
         }else{
             $error = 'El pedido no tiene productos asignados';
             $estado = "3";
