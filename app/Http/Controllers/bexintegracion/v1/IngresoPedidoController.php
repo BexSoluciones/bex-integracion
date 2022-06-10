@@ -271,7 +271,7 @@ class IngresoPedidoController extends Controller
             'nit_cliente' => 'required|digits_between:1,15',
             'sucursal_cliente' => 'required|digits_between:1,15',
             'centro_operacion' => 'required|digits_between:1,15',
-            'cedula_vendedor' => 'required|max:100',
+            'cedula_vendedor' => 'required|min:4|max:100|digits_between:1,15',
             'vendedor' => 'required|max:255',
             'observaciones_pedido' => 'max:2000',
         ];
