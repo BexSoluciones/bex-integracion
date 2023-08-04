@@ -13,6 +13,12 @@ use Illuminate\Support\Facades\Validator;
 class IngresoPedidoController extends Controller
 {
     use TraitHerramientas;
+    protected $installer;
+
+    public function __construct($installer)
+    {
+        $this->installer = $installer;
+    }
 
     const CAMPOS_AUTORIZADOS_ENCABEZADO = [
         ['campo' => 'numero_pedido'],

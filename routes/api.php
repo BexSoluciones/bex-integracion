@@ -42,6 +42,7 @@ Route::group([
         
 
         Route::post('bexintegracion/v1/pedidos', 'bexintegracion\v1\IngresoPedidoController@recibirPedidoJson');
+        Route::get('bexintegracion/v1/pedidos', 'bexintegracion\v1\PedidoController@getPedidoWms');
 
         Route::post('bexintegracion/v1/clientes', 'bexintegracion\v1\ClienteController@saveCliente');
 
