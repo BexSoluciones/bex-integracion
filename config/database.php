@@ -83,6 +83,20 @@ return [
             ]) : [],
         ],
 
+
+        'globoland' => [
+            'driver' => 'mysql',
+            'host' => 'server05.bexsoluciones.com',
+            'database' => env('DB_GLOBOLAND_DATABASE'),
+            'username' => 'platafor_sys',
+            'password' => 'lnRRfaen',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+        ],
+        
+
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),
