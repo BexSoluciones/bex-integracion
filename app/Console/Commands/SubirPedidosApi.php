@@ -173,6 +173,17 @@ class SubirPedidosApi extends Command {
 
                     $error = false;
                 } else {
+
+                    if(isset($response['error'])){
+                        $customConnection->table('tbldmovenc')
+                            ->where('CODMOVENC', $pedido->CODMOVENC)
+                            ->update([
+                                'estadoenviows' => '3',
+                                'fechamovws' => Carbon::now(),
+                                'msmovws' => $response['error']['message']['value'],
+                            ]);
+                    }
+                    /*
                     $errorMessage = $response['Message'] ?? '';
                     if (isset($errorMessage['Message']) && strpos($errorMessage['Message'], "Error El Pedido: {$pedido->NUMMOV} Ya Existe") !== false) {
                         $erroresms = "El pedido ya existe. Se marca como enviado.";
@@ -196,7 +207,7 @@ class SubirPedidosApi extends Command {
                                 'fechamovws' => Carbon::now(),
                                 'msmovws' => $erroresms,
                             ]);
-                    }
+                    }*/
                 }
             }
         } catch (\Exception $e) {
