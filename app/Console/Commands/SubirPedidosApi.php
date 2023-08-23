@@ -158,11 +158,11 @@ class SubirPedidosApi extends Command {
                     'Content-Type' => 'application/json',
                     'Cookie' => "B1SESSION={$token}; ROUTEID=.node2",
                 ])->withoutVerifying()->post($url, $DATA);
-                
-                if ($response['Confirmed'] == "tYES") {
+
+                if (isset($response['Confirmed']) && $response['Confirmed'] == "tYES") {
                     $erroresms = "<strong> Pedido enviado #{$pedido->NUMMOV} exitosamente!, Con la referencia {$response['Reference1']} </strong>";
                     $this->info($erroresms);
-
+            
                     $customConnection->table('tbldmovenc')
                         ->where('CODMOVENC', $pedido->CODMOVENC)
                         ->update([
@@ -170,44 +170,30 @@ class SubirPedidosApi extends Command {
                             'fechamovws' => Carbon::now(),
                             'msmovws' => $erroresms,
                         ]);
-
+            
                     $error = false;
+                } elseif (isset($response['error'])) {
+                 
+                    $errorCode = $response['error']['code'];
+                    $errorMessage = $response['error']['message']['value'];
+                    $customConnection->table('tbldmovenc')
+                        ->where('CODMOVENC', $pedido->CODMOVENC)
+                        ->update([
+                            'estadoenviows' => '3',
+                            'fechamovws' => Carbon::now(),
+                            'msmovws' => $errorMessage,
+                        ]);
+                        $this->info('Error Capturado: '.$errorMessage);
                 } else {
-
-                    if(isset($response['error'])){
-                        $customConnection->table('tbldmovenc')
-                            ->where('CODMOVENC', $pedido->CODMOVENC)
-                            ->update([
-                                'estadoenviows' => '3',
-                                'fechamovws' => Carbon::now(),
-                                'msmovws' => $response['error']['message']['value'],
-                            ]);
-                    }
-                    /*
-                    $errorMessage = $response['Message'] ?? '';
-                    if (isset($errorMessage['Message']) && strpos($errorMessage['Message'], "Error El Pedido: {$pedido->NUMMOV} Ya Existe") !== false) {
-                        $erroresms = "El pedido ya existe. Se marca como enviado.";
-                        $this->info($erroresms);
-
-                        $customConnection->table('tbldmovenc')
-                            ->where('CODMOVENC', $pedido->CODMOVENC)
-                            ->update([
-                                'estadoenviows' => '2',
-                                'fechamovws' => Carbon::now(),
-                                'msmovws' => $erroresms,
-                            ]);
-                    } else {
-                        $erroresms = "Pedido con errores. Error: {$response->status()} - Mensaje: {$response->body()}";
-                        $this->info($erroresms);
-
-                        $customConnection->table('tbldmovenc')
-                            ->where('CODMOVENC', $pedido->CODMOVENC)
-                            ->update([
-                                'estadoenviows' => '3',
-                                'fechamovws' => Carbon::now(),
-                                'msmovws' => $erroresms,
-                            ]);
-                    }*/
+                    $errorMessage = "Respuesta inesperada del servidor.";
+                    $customConnection->table('tbldmovenc')
+                        ->where('CODMOVENC', $pedido->CODMOVENC)
+                        ->update([
+                            'estadoenviows' => '3',
+                            'fechamovws' => Carbon::now(),
+                            'msmovws' => $errorMessage,
+                        ]);
+                        $this->info('Error Capturado: '.$errorMessage);
                 }
             }
         } catch (\Exception $e) {
