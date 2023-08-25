@@ -134,7 +134,7 @@ class SubirPedidosApi extends Command {
                 $DATADET = [];
                 foreach ($pedidosdets as $pedidosdet) {
                     $DATADET[] = [
-                        'ItemCode' => str_replace('B', '', $pedidosdet->CODPRODUCTO),
+                        'ItemCode' => ltrim($pedidosdet->CODPRODUCTO, 'B'),
                         'Quantity' => floatval($pedidosdet->CANTIDADMOV),
                         'TaxCode' => $pedidosdet->CCOSTOS,
                         'UnitPrice' => floatval($pedidosdet->PRECIOMOV)
