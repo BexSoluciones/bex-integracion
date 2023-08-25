@@ -114,7 +114,8 @@ class SubirPedidosApi extends Command {
                 
                 // Consulta para obtener los detalles del pedido
                 $pedidosdets = $customConnection->table('tbldmovdet')
-                    ->select('tbldmovdet.CODMOVDET', 'tbldmovdet.CODMOVENC', 'tbldmovdet.CODEMPRESA', DB::raw("REPLACE(tbldmovdet.CODPRODUCTO, 'B', '') AS CODPRODUCTO"), 
+                    ->select('tbldmovdet.CODMOVDET', 'tbldmovdet.CODMOVENC', 'tbldmovdet.CODEMPRESA', 
+                        DB::raw("CASE WHEN LEFT(tbldmovdet.CODPRODUCTO, 1) = 'B' THEN SUBSTRING(tbldmovdet.CODPRODUCTO, 2) ELSE tbldmovdet.CODPRODUCTO END AS CODPRODUCTO"), 
                         'tbldmovdet.PREFMOV', 'tbldmovdet.NUMMOV', 'tbldmovdet.CODBODEGA', 'tbldmovdet.CODPRODUCTO', 'tbldmovdet.CANTIDADMOV',
                         'tbldmovdet.PRECIOMOV', 'tbldmovdet.IVAMOV', 'tblmproducto.CCOSTOS', 'tbldmovdet.CODMOTDEV', 'tbldmovdet.BONENTREGAPRODUCTO',
                         'tbldmovdet.DCTO1MOV', 'tbldmovdet.DCTO2MOV', 'tbldmovdet.DCTO3MOV', 'tbldmovdet.DCTO4MOV', 'tbldmovdet.motentrega',
