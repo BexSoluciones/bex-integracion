@@ -9,6 +9,7 @@ use App\Traits\ConnectionDBTrait;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 class SubirPedidosApi extends Command {
     
@@ -134,7 +135,7 @@ class SubirPedidosApi extends Command {
                 $DATADET = [];
                 foreach ($pedidosdets as $pedidosdet) {
                     $DATADET[] = [
-                        'ItemCode' => ltrim($pedidosdet->CODPRODUCTO, 'B'),
+                        'ItemCode' => $cbd == '251' ? ltrim($pedidosdet->CODPRODUCTO, 'B') : $pedidosdet->CODPRODUCTO,
                         'Quantity' => floatval($pedidosdet->CANTIDADMOV),
                         'TaxCode' => $pedidosdet->CCOSTOS,
                         'UnitPrice' => floatval($pedidosdet->PRECIOMOV)
@@ -152,7 +153,11 @@ class SubirPedidosApi extends Command {
                 
                 //$this->info("Ejecutando Movimiento: {$pedido->NUMMOV} - {$pedido->CODTIPODOC}");
                 //$this->info($DATAjson);
-            
+
+                // Crear archivo en el storage
+                $nameFile = 'PED-' . $pedido->NUMMOV . '.json';
+                Storage::disk('local')->put($database .'/pedidos/json/' . $nameFile, $DATAjson);
+                
                 $url = $dataConfigApi->urlEnvio;
                 $response = Http::withHeaders([
                     'Content-Type' => 'application/json',
