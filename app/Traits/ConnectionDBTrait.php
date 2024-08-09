@@ -7,15 +7,19 @@ use App\Models\Connection;
 use Illuminate\Support\Facades\DB;
 
 trait ConnectionDBTrait {
-    
+
     public function connectionDB($database, $cbd){
-    
+
         if($database == "globoland"){
             $host = 'server05.bexsoluciones.com';
         }
 
         if($database == "verdeazul"){
             $host = 'server07.bexsoluciones.com';
+        }
+
+        if($database == "bycsasap"){
+            $host = 'server03.bexsoluciones.com';
         }
 
         try {
