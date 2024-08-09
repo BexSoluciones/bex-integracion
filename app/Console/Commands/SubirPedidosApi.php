@@ -12,27 +12,27 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
 class SubirPedidosApi extends Command {
-    
+
     use ConnectionDBTrait;
 
     protected $signature   = 'command:subir-pedido-api {database} {cbd?} {tipodocori?} {rango?}';
     protected $description = 'Gestionamiento para subir los pedidos a la API';
-   
+
     public function handle() {
-        
+
         $database = $this->argument('database');
         $cbd      = $this->argument('cbd');
         $tipodoc  = $this->argument('tipodocori') ?? "4";
         $rango    = $this->argument('rango')      ?? "";
 
-        if($database == "globoland" || $database == "verdeazul"){
+        if($database == "globoland" || $database == "verdeazul" || $database == "bycsasap"){
             $this->connectionDB($database, $cbd);
             $customConnection = DB::connection('dynamic_connection');
             $dataConfigApi    = $customConnection->table('ws_unoee_config')
                                                  ->select('url', 'NombreConexion', 'Clave', 'Usuario', 'urlEnvio')
                                                  ->first();
 
-            // Eliminar las barras invertidas 
+            // Eliminar las barras invertidas
             $dataConfigApi->Usuario = stripslashes($dataConfigApi->Usuario);
         }else{
             $this->error("Base de Datos no reconocida");
@@ -40,7 +40,7 @@ class SubirPedidosApi extends Command {
 
         //$formattedResults = json_encode($dataConfigApi, JSON_PRETTY_PRINT);
         //$this->info($formattedResults);
-      
+
         try {
             //Obtener token consumo de API
             $apiUrl = $dataConfigApi->url.'Login';
@@ -56,7 +56,7 @@ class SubirPedidosApi extends Command {
 
             $data = json_decode($response->getBody());
             $token = $data->SessionId;
-            
+
             $this->info('Token: ' . $token);
 
             //Pedidos en estado '1' para pasarlos a estado '0'
@@ -65,7 +65,7 @@ class SubirPedidosApi extends Command {
                 ->whereNotNull('NUMCIERRE')
                 ->whereNotNull('FECHORCIERRE')
                 ->where('estadoenviows', '1')
-                ->where('fechamovws', '<', Carbon::now()->subHour(1)) 
+                ->where('fechamovws', '<', Carbon::now()->subHour(1))
                 ->update([
                     'estadoenviows' => '0',
                     'fechamovws' => Carbon::now(),
@@ -75,22 +75,22 @@ class SubirPedidosApi extends Command {
 
             //Pedidos estado '0'
             $pedidosEstadoCero = $customConnection->table('tbldmovenc')
-                ->select('tbldmovenc.CODMOVENC', 'tbldmovenc.CODEMPRESA', 'tbldmovenc.CODTIPODOC', 'tbldmovenc.PREFMOV', 
-                    'tbldmovenc.NUMMOV', 'tbldmovenc.CODVENDEDOR', 'tbldmovenc.NUMVISITA', 'tbldmovenc.CODCLIENTE', 
-                    'tbldmovenc.CODPRECIO', 'tbldmovenc.CODDESCUENTO', 'tbldmovenc.CODMOTVIS', 'tbldmovenc.FECHORINIVISITA', 
+                ->select('tbldmovenc.CODMOVENC', 'tbldmovenc.CODEMPRESA', 'tbldmovenc.CODTIPODOC', 'tbldmovenc.PREFMOV',
+                    'tbldmovenc.NUMMOV', 'tbldmovenc.CODVENDEDOR', 'tbldmovenc.NUMVISITA', 'tbldmovenc.CODCLIENTE',
+                    'tbldmovenc.CODPRECIO', 'tbldmovenc.CODDESCUENTO', 'tbldmovenc.CODMOTVIS', 'tbldmovenc.FECHORINIVISITA',
                     'tbldmovenc.FECHORFINVISITA', 'tbldmovenc.EXTRARUTAVISITA', 'tbldmovenc.FECMOV', 'tbldmovenc.CODVEHICULO',
                     'tbldmovenc.MOTENTREGA', 'tbldmovenc.FECHORENTREGAMOV', 'tbldmovenc.CODFPAGOVTA', 'tbldmovenc.NUMCIERRE',
-                    'tbldmovenc.FECHORCIERRE', 'tbldmovenc.CODGRACIERRE', 'tbldmovenc.NUMCARGUE', 'tbldmovenc.FECHORCARGUE', 
-                    'tbldmovenc.DIARUTERO', 'tbldmovenc.NUMLIQUIDACION', 'tbldmovenc.FECHORLIQUIDACION', 
-                    'tbldmovenc.ORDENCARGUEMOV', 'tbldmovenc.MENSAJEMOV', 'tbldmovenc.JAVAID', 'tbldmovenc.FECCAP', 
-                    'tbldmovenc.NUMMOVALT', 'tbldmovenc.FECNOVEDAD', 'tbldmovenc.autorizacion', 'tbldmovenc.fechorentregacli', 
+                    'tbldmovenc.FECHORCIERRE', 'tbldmovenc.CODGRACIERRE', 'tbldmovenc.NUMCARGUE', 'tbldmovenc.FECHORCARGUE',
+                    'tbldmovenc.DIARUTERO', 'tbldmovenc.NUMLIQUIDACION', 'tbldmovenc.FECHORLIQUIDACION',
+                    'tbldmovenc.ORDENCARGUEMOV', 'tbldmovenc.MENSAJEMOV', 'tbldmovenc.JAVAID', 'tbldmovenc.FECCAP',
+                    'tbldmovenc.NUMMOVALT', 'tbldmovenc.FECNOVEDAD', 'tbldmovenc.autorizacion', 'tbldmovenc.fechorentregacli',
                     'tbldmovenc.CODGRAAUTORIZACION', 'tbldmovenc.DCTOGLOBAL', 'tbldmovenc.NUMCIERREREC',
-                    'tbldmovenc.FECHORCIERREREC', 'tbldmovenc.CODGRACIERREREC', 'tbldmovenc.PROYECTO', 'tbldmovenc.EXPORTADO', 
-                    'tbldmovenc.MENSAJEADIC', 'tbldmovenc.CONSCAMPANAOK', 'tbldmovenc.CODVENDEDORTRANS', 'tbldmovenc.EMAILB2B', 
-                    'tbldmovenc.ORIGEN', 'tbldmovenc.ORDENDECOMPRA', 'tbldmovenc.direntrega', 'tbldmovenc.tipoentrega', 
-                    'tbldmovenc.nummovtr', 'tbldmovenc.prefmovtr', 'tbldmovenc.backorder', 'tbldmovenc.prospecto', 
+                    'tbldmovenc.FECHORCIERREREC', 'tbldmovenc.CODGRACIERREREC', 'tbldmovenc.PROYECTO', 'tbldmovenc.EXPORTADO',
+                    'tbldmovenc.MENSAJEADIC', 'tbldmovenc.CONSCAMPANAOK', 'tbldmovenc.CODVENDEDORTRANS', 'tbldmovenc.EMAILB2B',
+                    'tbldmovenc.ORIGEN', 'tbldmovenc.ORDENDECOMPRA', 'tbldmovenc.direntrega', 'tbldmovenc.tipoentrega',
+                    'tbldmovenc.nummovtr', 'tbldmovenc.prefmovtr', 'tbldmovenc.backorder', 'tbldmovenc.prospecto',
                     'tbldmovenc.puntosenvio', 'tbldmovenc.estadoenviows', 'tbldmovenc.fechamovws', 'tbldmovenc.msmovws',
-                    'tbldmovenc.udid', 'tbldmovenc.os', 'tbldmovenc.ip', 'tbldmovenc.tipofactura', 'tbldmovenc.adjunto1', 
+                    'tbldmovenc.udid', 'tbldmovenc.os', 'tbldmovenc.ip', 'tbldmovenc.tipofactura', 'tbldmovenc.adjunto1',
                     'tbldmovenc.adjunto2', 'tbldmovenc.adjunto3', 'tblmvendedor.tercvendedor', 'tblmcliente.nitcliente')
                 ->join('tblmvendedor', 'tbldmovenc.CODVENDEDOR', '=', 'tblmvendedor.CODVENDEDOR')
                 ->join('tblmcliente', 'tbldmovenc.CODCLIENTE', '=', 'tblmcliente.codcliente')
@@ -112,7 +112,7 @@ class SubirPedidosApi extends Command {
 
                 $formattedResults = json_encode($updatePedido, JSON_PRETTY_PRINT);
                 $this->info('convirtiendo pedido '.$pedido->CODMOVENC.' a estado 1: ' . (($formattedResults == 1) ? 'actualizado' : 'error'));
-                
+
                 // Consulta para obtener los detalles del pedido
                 $pedidosdets = $customConnection->table('tbldmovdet')
                     ->select('tbldmovdet.CODMOVDET', 'tbldmovdet.CODMOVENC', 'tbldmovdet.CODEMPRESA', 'tbldmovdet.CODTIPODOC',
@@ -123,15 +123,15 @@ class SubirPedidosApi extends Command {
                         'tbldmovdet.PREPACK', 'tbldmovdet.AUTORIZACION','tbldmovdet.CANTID1', 'tbldmovdet.UNIDAD01','tbldmovdet.UNIDAD02',
                         'tbldmovdet.OBSEQUIO1', 'tbldmovdet.OBSEQUIO2', 'tbldmovdet.CANTID2', 'tbldmovdet.IDLISPRE', 'tbldmovdet.PRODUCTOPADRE',
                         'tbldmovdet.dctovalor', 'tbldmovdet.autovalor', 'tbldmovdet.ocultorowid', 'tbldmovdet.ocultoporcval', 'tbldmovdet.id_ofertasenc',
-                        'tbldmovdet.tipo_oferta', 'tbldmovdet.grupo_oferta', 'tbldmovdet.rowid', 'tbldmovdet.cantidadpines', 'tbldmovdet.codmotpines', 
+                        'tbldmovdet.tipo_oferta', 'tbldmovdet.grupo_oferta', 'tbldmovdet.rowid', 'tbldmovdet.cantidadpines', 'tbldmovdet.codmotpines',
                         'tbldmovdet.impconsumo', 'tbldmovdet.codaprobpines', 'tbldmovdet.lote', 'tbldmovdet.peso', 'tbldmovdet.fletesimple')
                     ->join('tblmproducto', 'tblmproducto.CODPRODUCTO', '=', 'tbldmovdet.CODPRODUCTO')
                     ->where('NUMMOV', $pedido->NUMMOV)
                     ->where('CODTIPODOC', $pedido->CODTIPODOC)
-                    ->get(); 
-                    
+                    ->get();
+
                 $this->info('Detalles de los pedidos: ' . $pedidosdets->count());
-                
+
                 $DATADET = [];
                 foreach ($pedidosdets as $pedidosdet) {
                     $DATADET[] = [
@@ -141,23 +141,23 @@ class SubirPedidosApi extends Command {
                         'UnitPrice' => floatval($pedidosdet->PRECIOMOV)
                     ];
                 }
-                
+
                 $DATA = [
                     'CardCode' => $pedido->nitcliente,
                     'DocDate' => $pedido->FECNOVEDAD,
                     'DocDueDate' => $pedido->fechorentregacli,
                     'DocumentLines' => $DATADET,
                 ];
-                
+
                 $DATAjson = json_encode($DATA);
-                
+
                 //$this->info("Ejecutando Movimiento: {$pedido->NUMMOV} - {$pedido->CODTIPODOC}");
                 //$this->info($DATAjson);
 
                 // Crear archivo en el storage
                 $nameFile = 'PED-' . $pedido->NUMMOV . '.json';
                 Storage::disk('local')->put($database .'/pedidos/json/' . $nameFile, $DATAjson);
-                
+
                 $url = $dataConfigApi->urlEnvio;
                 $response = Http::withHeaders([
                     'Content-Type' => 'application/json',
@@ -167,7 +167,7 @@ class SubirPedidosApi extends Command {
                 if (isset($response['Confirmed']) && $response['Confirmed'] == "tYES") {
                     $erroresms = "<strong> Pedido enviado #{$pedido->NUMMOV} exitosamente!, Con la referencia {$response['Reference1']} </strong>";
                     $this->info($erroresms);
-            
+
                     $customConnection->table('tbldmovenc')
                         ->where('CODMOVENC', $pedido->CODMOVENC)
                         ->update([
@@ -175,10 +175,10 @@ class SubirPedidosApi extends Command {
                             'fechamovws' => Carbon::now(),
                             'msmovws' => $erroresms,
                         ]);
-            
+
                     $error = false;
                 } elseif (isset($response['error'])) {
-                 
+
                     $errorCode = $response['error']['code'];
                     $errorMessage = $response['error']['message']['value'];
                     $customConnection->table('tbldmovenc')
