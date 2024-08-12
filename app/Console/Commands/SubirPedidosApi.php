@@ -146,6 +146,7 @@ class SubirPedidosApi extends Command {
                     'CardCode' => $pedido->nitcliente,
                     'DocDate' => $pedido->FECNOVEDAD,
                     'DocDueDate' => $pedido->fechorentregacli,
+                    'Comments' => $pedido->NUMMOV.' - '.$pedido->MENSAJEMOV,
                     'DocumentLines' => $DATADET,
                 ];
 
