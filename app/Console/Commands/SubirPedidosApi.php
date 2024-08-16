@@ -91,7 +91,7 @@ class SubirPedidosApi extends Command {
                     'tbldmovenc.nummovtr', 'tbldmovenc.prefmovtr', 'tbldmovenc.backorder', 'tbldmovenc.prospecto',
                     'tbldmovenc.puntosenvio', 'tbldmovenc.estadoenviows', 'tbldmovenc.fechamovws', 'tbldmovenc.msmovws',
                     'tbldmovenc.udid', 'tbldmovenc.os', 'tbldmovenc.ip', 'tbldmovenc.tipofactura', 'tbldmovenc.adjunto1',
-                    'tbldmovenc.adjunto2', 'tbldmovenc.adjunto3', 'tblmvendedor.tercvendedor', 'tblmcliente.nitcliente')
+                    'tbldmovenc.adjunto2', 'tbldmovenc.adjunto3', 'tblmvendedor.tercvendedor', 'tblmcliente.nitcliente','tblmvendedor.ccostos')
                 ->join('tblmvendedor', 'tbldmovenc.CODVENDEDOR', '=', 'tblmvendedor.CODVENDEDOR')
                 ->join('tblmcliente', 'tbldmovenc.CODCLIENTE', '=', 'tblmcliente.codcliente')
                 ->whereNotNull('NUMCIERRE')
@@ -147,6 +147,9 @@ class SubirPedidosApi extends Command {
                     'DocDate' => $pedido->FECNOVEDAD,
                     'DocDueDate' => $pedido->fechorentregacli,
                     'Comments' => $pedido->NUMMOV.' - '.$pedido->MENSAJEMOV,
+                    'SalesPersonCode' => $cbd == '167' ? $pedido->CODVENDEDOR : $pedido->tercvendedor,
+                    'NumAtCard' => $pedido->ORDENDECOMPRA,
+                    'Series' => $pedido->ccostos,
                     'DocumentLines' => $DATADET,
                 ];
 
