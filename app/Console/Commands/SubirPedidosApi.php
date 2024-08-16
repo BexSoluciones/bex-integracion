@@ -138,7 +138,8 @@ class SubirPedidosApi extends Command {
                         'ItemCode' => $cbd == '251' ? ltrim($pedidosdet->CODPRODUCTO, 'B') : $pedidosdet->CODPRODUCTO,
                         'Quantity' => floatval($pedidosdet->CANTIDADMOV),
                         'TaxCode' => $pedidosdet->CCOSTOS,
-                        'UnitPrice' => floatval($pedidosdet->PRECIOMOV)
+                        'UnitPrice' => floatval($pedidosdet->PRECIOMOV),
+                        'WarehouseCode' => $pedidosdet->CODBODEGA
                     ];
                 }
 
