@@ -38,6 +38,33 @@ class SubirPedidosApi extends Command {
             $this->error("Base de Datos no reconocida");
         }
 
+        $export = $customConnection->table('tbldexportar')
+        ->select('codigo', 'proceso', 'estado', 'fechaejecucion')
+        ->where('codigo', $tipodoc)
+        ->first();
+        if($export->estado == 1){
+            if($export->fechaejecucion < Carbon::now()->subHour(1)){
+
+                $customConnection->table('tbldexportar')
+                ->where('codigo', $tipodoc)
+                ->update([
+                    'estado' => '0',
+                    'fechaejecucion' => Carbon::now()
+                ]);
+                $this->info('Estado de los pedidos actualizado en cero');
+            }else{
+                $this->info('Ya hay un proceso en ejecucion');
+                return;
+            }
+        }
+
+        $customConnection->table('tbldexportar')
+        ->where('codigo', $tipodoc)
+        ->update([
+            'estado' => '1',
+            'fechaejecucion' => Carbon::now()
+        ]);
+
         //$formattedResults = json_encode($dataConfigApi, JSON_PRETTY_PRINT);
         //$this->info($formattedResults);
 
@@ -106,8 +133,10 @@ class SubirPedidosApi extends Command {
             foreach ($pedidosEstadoCero as $pedido) {
                 $updatePedido = $customConnection->table('tbldmovenc')
                     ->where('CODMOVENC', $pedido->CODMOVENC)
+                    ->where('estadoenviows', '0')
                     ->update([
-                        'estadoenviows' => '1'
+                        'estadoenviows' => '1',
+                        'fechamovws' => Carbon::now()
                     ]);
 
                 $formattedResults = json_encode($updatePedido, JSON_PRETTY_PRINT);
@@ -175,6 +204,7 @@ class SubirPedidosApi extends Command {
 
                     $customConnection->table('tbldmovenc')
                         ->where('CODMOVENC', $pedido->CODMOVENC)
+                        ->where('estadoenviows', '1')
                         ->update([
                             'estadoenviows' => '2',
                             'fechamovws' => Carbon::now(),
@@ -188,6 +218,7 @@ class SubirPedidosApi extends Command {
                     $errorMessage = $response['error']['message']['value'];
                     $customConnection->table('tbldmovenc')
                         ->where('CODMOVENC', $pedido->CODMOVENC)
+                        ->where('estadoenviows', '1')
                         ->update([
                             'estadoenviows' => '3',
                             'fechamovws' => Carbon::now(),
@@ -206,6 +237,14 @@ class SubirPedidosApi extends Command {
                         $this->info('Error Capturado: '.$errorMessage);
                 }
             }
+
+            $customConnection->table('tbldexportar')
+            ->where('codigo', $tipodoc)
+            ->update([
+                'estado' => '0',
+                'fechaejecucion' => Carbon::now()
+            ]);
+
         } catch (\Exception $e) {
             $this->error("Ocurrió un error durante la conexión: " . $e->getMessage());
         }
