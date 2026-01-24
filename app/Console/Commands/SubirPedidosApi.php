@@ -118,12 +118,19 @@ class SubirPedidosApi extends Command {
                     'tbldmovenc.nummovtr', 'tbldmovenc.prefmovtr', 'tbldmovenc.backorder', 'tbldmovenc.prospecto',
                     'tbldmovenc.puntosenvio', 'tbldmovenc.estadoenviows', 'tbldmovenc.fechamovws', 'tbldmovenc.msmovws',
                     'tbldmovenc.udid', 'tbldmovenc.os', 'tbldmovenc.ip', 'tbldmovenc.tipofactura', 'tbldmovenc.adjunto1',
-                    'tbldmovenc.adjunto2', 'tbldmovenc.adjunto3', 'tblmvendedor.tercvendedor', 'tblmcliente.nitcliente','tblmvendedor.ccostos')
+                    'tbldmovenc.adjunto2', 'tbldmovenc.adjunto3', 'tblmvendedor.tercvendedor', 'tblmcliente.nitcliente','tblmvendedor.ccostos','tbldmovenc_adic.valor')
                 ->join('tblmvendedor', 'tbldmovenc.CODVENDEDOR', '=', 'tblmvendedor.CODVENDEDOR')
                 ->join('tblmcliente', 'tbldmovenc.CODCLIENTE', '=', 'tblmcliente.codcliente')
-                ->whereNotNull('NUMCIERRE')
-                ->whereNotNull('FECHORCIERRE')
-                ->where('estadoenviows', '0')
+                ->leftJoin('tbldmovenc_adic', function($join){
+                    $join->on('tbldmovenc.CODVENDEDOR', '=', 'tbldmovenc_adic.codvendedor')
+                         ->on('tbldmovenc.NUMVISITA', '=', 'tbldmovenc_adic.numvisita')
+                         ->on('tbldmovenc.NUMMOV', '=', 'tbldmovenc_adic.nummov')
+                         ->on('tbldmovenc.PREFMOV', '=', 'tbldmovenc_adic.prefmov')
+                         ->where('tbldmovenc_adic.id_pimovilcampo', '=', '1');
+                })
+                ->whereNotNull('tbldmovenc.NUMCIERRE')
+                ->whereNotNull('tbldmovenc.FECHORCIERRE')
+                ->where('tbldmovenc.estadoenviows', '0')
                 ->limit(20)
                 ->get();
 
@@ -180,6 +187,7 @@ class SubirPedidosApi extends Command {
                     'SalesPersonCode' => $cbd == '167' ? $pedido->CODVENDEDOR : $pedido->tercvendedor,
                     'NumAtCard' => $pedido->ORDENDECOMPRA,
                     'Series' => $pedido->ccostos,
+                    'PickRemark' => $pedido->valor ?? "",
                     'DocumentLines' => $DATADET,
                 ];
 
