@@ -12,14 +12,20 @@ trait ConnectionDBTrait {
 
         if($database == "globoland"){
             $host = 'server05.bexsoluciones.com';
+            $username = 'platafor_sys';
+            $password = 'lnRRfaen';
         }
 
         if($database == "verdeazul"){
             $host = 'server07.bexsoluciones.com';
+            $username = 'platafor_sys';
+            $password = 'lnRRfaen';
         }
 
         if($database == "bycsasap"){
-            $host = 'server03.bexsoluciones.com';
+            $host = '34.45.220.88';
+            $username = 'app_integraciones';
+            $password = 'zuFG4X,GShG]Mkz';
         }
 
         try {
@@ -29,8 +35,8 @@ trait ConnectionDBTrait {
                     'driver'    => 'mysql',
                     'host'      => $host,
                     'database'  => 'platafor_pi'.$cbd,
-                    'username'  => 'platafor_sys',
-                    'password'  => 'lnRRfaen',
+                    'username'  => $username,
+                    'password'  => $password,
                     'charset'   => 'utf8mb4',
                     'collation' => 'utf8mb4_unicode_ci',
                     'prefix'    => '',
