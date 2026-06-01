@@ -17,9 +17,9 @@ trait ConnectionDBTrait {
         }
 
         if($database == "verdeazul"){
-            $host = 'server07.bexsoluciones.com';
-            $username = 'platafor_sys';
-            $password = 'lnRRfaen';
+            $host = '34.45.220.88';
+            $username = 'bexmovil_remote';
+            $password = 'Q7x$9Lm2@vR83!pz4K';
         }
 
         if($database == "bycsasap"){
